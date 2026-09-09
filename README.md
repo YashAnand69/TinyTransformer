@@ -10,7 +10,7 @@ Includes real-time autoregressive text generation, interactive loss curves, mult
 
 ### 1. Launch Both Backend & Frontend
 ```bash
-cd /Users/yashanand/Desktop/Projects/p5
+cd /Users/yashanand/Desktop/Projects/TinyTransformer
 ./run.sh
 ```
 - **Web Dashboard**: [http://127.0.0.1:5173](http://127.0.0.1:5173)

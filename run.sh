@@ -47,7 +47,7 @@ fi
 # 2. Launch FastAPI Inference Server
 echo "🚀 [1/2] Starting Backend Inference API on http://127.0.0.1:8008..."
 cd "$BACKEND_DIR"
-"$BACKEND_DIR/.venv/bin/uvicorn" server:app --host 127.0.0.1 --port 8008 --log-level warning &
+"$BACKEND_DIR/.venv/bin/python" -m uvicorn server:app --host 127.0.0.1 --port 8008 --log-level warning &
 BACKEND_PID=$!
 
 # Wait for backend to be healthy
