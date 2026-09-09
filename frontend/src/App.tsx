@@ -492,7 +492,7 @@ export default function App() {
       <PaintTransitionOverlay />
 
       {/* 3D Specular Navier-Stokes Fluid Dynamics Canvas */}
-      <FluidCanvas intensity={0.9} mode={fluidMode} theme={theme} />
+      <FluidCanvas intensity={theme === 'light' ? 1.15 : 0.9} mode={fluidMode} theme={theme} />
 
       {/* Clean Minimalist Header */}
       <header className="app-header">
