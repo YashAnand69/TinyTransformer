@@ -487,12 +487,12 @@ export default function App() {
   const currentScrubberItem = PROGRESSION_TIMELINE[scrubberIndex];
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       {/* Liquid Paint Ripple Wave Screen Fill Overlay */}
       <PaintTransitionOverlay />
 
-      {/* 3D Specular Navier-Stokes Fluid Dynamics Canvas */}
-      <FluidCanvas intensity={theme === 'light' ? 1.15 : 0.9} mode={fluidMode} theme={theme} />
+      {/* 3D Specular Navier-Stokes Fluid Dynamics Canvas (Layered in Background) */}
+      <FluidCanvas intensity={theme === 'light' ? 0.70 : 0.85} mode={fluidMode} theme={theme} />
 
       {/* Clean Minimalist Header */}
       <header className="app-header">
