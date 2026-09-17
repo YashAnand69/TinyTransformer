@@ -3,8 +3,7 @@
    Inspired by Linear, Vercel, Apple Developer, and Claude UI
    ========================================================================== */
 
-:root,
-[data-theme="dark"] {
+:root {
   /* Surface & Canvas */
   --bg-app: #09090b;
   --bg-surface: #111114;
@@ -63,76 +62,6 @@
   --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-[data-theme="light"] {
-  /* Surface & Canvas */
-  --bg-app: #f8fafc;
-  --bg-surface: #ffffff;
-  --bg-surface-elevated: #ffffff;
-  --bg-surface-subtle: #f1f5f9;
-  --bg-surface-hover: #e2e8f0;
-
-  /* Text & Contrast */
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-tertiary: #94a3b8;
-  --text-inverse: #ffffff;
-
-  /* Borders */
-  --border-subtle: rgba(15, 23, 42, 0.08);
-  --border-strong: rgba(15, 23, 42, 0.16);
-  --border-focus: rgba(15, 23, 42, 0.35);
-
-  /* Accents */
-  --accent-primary: #0f172a;
-  --accent-blue: #2563eb;
-  --accent-emerald: #059669;
-  --accent-amber: #d97706;
-
-  /* Surfaces, Shadows & Elements */
-  --header-bg: rgba(255, 255, 255, 0.88);
-  --card-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
-  --card-shadow-hover: 0 8px 30px rgba(15, 23, 42, 0.09);
-  --slider-track: #e2e8f0;
-  --scrollbar-thumb: rgba(15, 23, 42, 0.16);
-  --scrollbar-thumb-hover: rgba(15, 23, 42, 0.28);
-  --pill-bg: rgba(15, 23, 42, 0.04);
-  --pill-bg-hover: rgba(15, 23, 42, 0.08);
-  --btn-secondary-bg: rgba(15, 23, 42, 0.04);
-  --btn-secondary-bg-hover: rgba(15, 23, 42, 0.08);
-  --badge-bg: rgba(15, 23, 42, 0.05);
-  --output-cursor: #0f172a;
-  --backdrop-modal: rgba(15, 23, 42, 0.5);
-  --paint-fill-color: #f8fafc;
-  --paint-ring-color: rgba(15, 23, 42, 0.35);
-  --code-bg: #f8fafc;
-  --code-header-bg: #eef2f6;
-}
-
-/* ==========================================================================
-   Hardware-Accelerated View Transitions for Paint Filling Screen Transition
-   ========================================================================== */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-
-::view-transition-old(root) {
-  z-index: 1;
-}
-
-::view-transition-new(root) {
-  z-index: 9999;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    animation: none !important;
-  }
-}
-
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -167,7 +96,7 @@ body {
   background: var(--scrollbar-thumb-hover);
 }
 
-/* Fluid Canvas Adaptivity */
+/* Fluid Canvas Background */
 .fluid-canvas {
   position: fixed;
   top: 0;
@@ -176,17 +105,9 @@ body {
   height: 100%;
   pointer-events: none;
   z-index: 0;
-  transition: opacity 0.4s ease;
-}
-
-[data-theme="dark"] .fluid-canvas {
   mix-blend-mode: screen;
   opacity: 0.85;
-}
-
-[data-theme="light"] .fluid-canvas {
-  mix-blend-mode: multiply;
-  opacity: 0.35;
+  transition: opacity 0.4s ease;
 }
 
 /* Layout Container */
@@ -450,33 +371,6 @@ body {
   border-color: var(--border-strong);
 }
 
-/* Theme Toggle Button */
-.theme-toggle-btn {
-  background: var(--btn-secondary-bg);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-primary);
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-sm);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.2s var(--ease-spring);
-}
-
-.theme-toggle-btn:hover {
-  background: var(--btn-secondary-bg-hover);
-  border-color: var(--border-strong);
-  transform: scale(1.05);
-}
-
-.theme-toggle-btn:active {
-  transform: scale(0.95);
-}
-
 /* Quick Prompt Pills */
 .prompt-pills-row {
   display: flex;
@@ -686,3 +580,8 @@ body {
   pointer-events: none;
   z-index: 10000;
 }
+
+.model-notice { color: var(--text-tertiary); font-size: .78rem; line-height: 1.6; margin: 0 0 1.4rem; max-width: 75ch; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid #60a5fa; outline-offset: 3px; }
+button:disabled { cursor: not-allowed; opacity: .55; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }

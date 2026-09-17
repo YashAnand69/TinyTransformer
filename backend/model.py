@@ -63,16 +63,19 @@ class CausalSelfAttention(nn.Module):
         q = q.view(B, T, self.n_head, self.head_dim).transpose(1, 2)  # (B, nh, T, hs)
         v = v.view(B, T, self.n_head, self.head_dim).transpose(1, 2)  # (B, nh, T, hs)
 
-        # Scaled dot-product attention: (Q @ K^T) / sqrt(d_k)
-        att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(self.head_dim))
+        att_weights = None
+        if return_attention:
+            # Explicit path stays inspectable and portable to ONNX.
+            att = (q @ k.transpose(-2, -1)) / math.sqrt(self.head_dim)
+            att = att.masked_fill(self.bias[:, :, :T, :T] == 0, float("-inf"))
+            att_weights = F.softmax(att, dim=-1)
+            y = self.attn_dropout(att_weights) @ v
+        else:
+            y = F.scaled_dot_product_attention(
+                q, k, v, is_causal=True,
+                dropout_p=self.attn_dropout.p if self.training else 0.0,
+            )
 
-        # Apply causal mask: fill upper triangle with -infinity so softmax gives 0 probability
-        att = att.masked_fill(self.bias[:, :, :T, :T] == 0, float("-inf"))
-        att_weights = F.softmax(att, dim=-1)
-        att_dropped = self.attn_dropout(att_weights)
-
-        # Multiply with V: (B, nh, T, T) @ (B, nh, T, hs) -> (B, nh, T, hs)
-        y = att_dropped @ v
         # Re-assemble all head outputs side-by-side
         y = y.transpose(1, 2).contiguous().view(B, T, C)
 
@@ -221,7 +224,9 @@ class TinyTransformerLM(nn.Module):
         temperature: float = 1.0,
         top_k: Optional[int] = None,
         top_p: Optional[float] = None,
-        return_step_details: bool = False
+        return_step_details: bool = False,
+        eos_token_id: Optional[int] = None,
+        generator: Optional[torch.Generator] = None,
     ) -> Tuple[torch.Tensor, List[Dict]]:
         """
         Autoregressive generation loop supporting:
@@ -271,7 +276,7 @@ class TinyTransformerLM(nn.Module):
                 if torch.isnan(probs).any() or probs.sum() <= 0:
                     idx_next = torch.argmax(raw_probs, dim=-1, keepdim=True)
                 else:
-                    idx_next = torch.multinomial(probs, num_samples=1)
+                    idx_next = torch.multinomial(probs.cpu() if generator is not None else probs, num_samples=1, generator=generator).to(idx.device)
             else:
                 # Greedy choice
                 idx_next = torch.argmax(logits, dim=-1, keepdim=True)
@@ -292,6 +297,8 @@ class TinyTransformerLM(nn.Module):
 
             # Append sampled token to sequence
             idx = torch.cat((idx, idx_next), dim=1)
+            if eos_token_id is not None and bool((idx_next == eos_token_id).all()):
+                break
 
         return idx, step_details
 

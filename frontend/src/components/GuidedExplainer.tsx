@@ -1,3 +1,4 @@
+import trainingReport from '../data/training_history.json';
 import { X, Compass, Cpu, Sliders, Lightbulb } from 'lucide-react';
 
 interface GuidedExplainerProps {
@@ -88,7 +89,7 @@ export default function GuidedExplainer({ isOpen, onClose }: GuidedExplainerProp
               <h4 style={{ fontSize: '0.86rem', color: 'var(--text-primary)', fontWeight: 600 }}>1. Built From Scratch (No Third-Party APIs)</h4>
             </div>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-              Unlike wrappers around external APIs (e.g. OpenAI or Anthropic), this model is an 813K parameter Causal Decoder Transformer coded mathematically in pure PyTorch and trained on Apple Silicon MPS directly from random Gaussian noise.
+              Unlike wrappers around external APIs (e.g. OpenAI or Anthropic), this model is a {trainingReport.summary.parameters.toLocaleString()} parameter Causal Decoder Transformer coded mathematically in pure PyTorch and trained directly from random Gaussian noise.
             </p>
           </div>
 

@@ -55,7 +55,7 @@ def load_system():
         ckpt_path = os.path.join(CKPT_DIR, "final_model.pt")
 
     if os.path.exists(ckpt_path) and tokenizer is not None:
-        checkpoint = torch.load(ckpt_path, map_location=DEVICE)
+        checkpoint = torch.load(ckpt_path, map_location=DEVICE, weights_only=True)
         cfg_dict = checkpoint.get("config", {})
         config = TinyTransformerConfig(**cfg_dict)
         model = TinyTransformerLM(config).to(DEVICE)
@@ -74,18 +74,18 @@ def startup_event():
 
 # Request/Response Schemas
 class GenerateRequest(BaseModel):
-    prompt: str = Field(default="=== LOG ENTRY", description="Input prompt text")
+    prompt: str = Field(default="User: What is attention?\nAssistant: ", max_length=4096, description="Input prompt text")
     max_new_tokens: int = Field(default=80, ge=1, le=256, description="Number of tokens to generate")
     temperature: float = Field(default=0.8, ge=0.0, le=2.0, description="Sampling temperature (0.0 for greedy)")
     top_k: Optional[int] = Field(default=20, ge=0, le=100, description="Top-K truncation limit (0 to disable)")
     top_p: Optional[float] = Field(default=0.9, ge=0.0, le=1.0, description="Top-P nucleus probability threshold")
-    seed: Optional[int] = Field(default=None, description="Random seed for reproducibility")
+    seed: Optional[int] = Field(default=None, ge=0, le=4294967295, description="Random seed for reproducibility")
 
 class AttentionRequest(BaseModel):
-    text: str = Field(default="=== LOG ENTRY: The silicon lattice", description="Text to analyze attention across")
+    text: str = Field(default="User: What is attention?", max_length=4096, description="Text to analyze attention across")
 
 class TokenizeRequest(BaseModel):
-    text: str = Field(default="", description="Text to tokenize")
+    text: str = Field(default="", max_length=4096, description="Text to tokenize")
 
 @app.get("/api/health")
 def health_check():
@@ -171,8 +171,7 @@ def generate_text(req: GenerateRequest):
     if model is None or tokenizer is None:
         raise HTTPException(status_code=503, detail="Model is still training or not loaded.")
 
-    if req.seed is not None:
-        torch.manual_seed(req.seed)
+    generator = torch.Generator().manual_seed(req.seed) if req.seed is not None else None
 
     start_time = time.time()
     
@@ -190,7 +189,9 @@ def generate_text(req: GenerateRequest):
         temperature=req.temperature,
         top_k=req.top_k,
         top_p=req.top_p,
-        return_step_details=True
+        return_step_details=True,
+        eos_token_id=tokenizer.eos_token_id,
+        generator=generator,
     )
 
     all_token_ids = out_tensor[0].cpu().tolist()
@@ -239,7 +240,7 @@ def get_attention(req: AttentionRequest):
     input_tensor = torch.tensor([token_ids], dtype=torch.long, device=DEVICE)
 
     attn_matrix = model.get_attention_matrix(input_tensor)
-    tokens_meta = tokenizer.analyze_tokens(tokenizer.decode(token_ids))
+    tokens_meta = tokenizer.analyze_tokens(text)[:32] if text else [{"display": "<BOS>"}]
 
     n_layers = len(attn_matrix)
     n_heads = len(attn_matrix[0]) if attn_matrix else 0

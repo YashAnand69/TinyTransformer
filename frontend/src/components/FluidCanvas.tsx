@@ -24,11 +24,11 @@ import { useEffect, useRef } from 'react';
  */
 
 export type FluidMode =
-  | 'cobalt'    // Royal Cobalt Ink (Deep electric blue, exceptional on light)
-  | 'obsidian'  // Sumi Charcoal (Dark graphite calligraphy ink, maximum contrast)
-  | 'emerald'   // Emerald Jade (Vivid imperial viridian & mint)
-  | 'amethyst'  // Imperial Amethyst (Velvet violet & neon orchid)
-  | 'crimson'   // Tuscan Crimson (Deep ruby & rose wine)
+  | 'cobalt'    // Cobalt Azure (Electric cyan & royal azure sheen)
+  | 'obsidian'  // Obsidian Charcoal (Graphite smoke & silver specular)
+  | 'emerald'   // Emerald Jade (Vivid viridian & mint luminescence)
+  | 'amethyst'  // Royal Amethyst (Velvet violet & neon orchid)
+  | 'crimson'   // Crimson Ruby (Tuscan ruby & rose wine)
   | 'ember'     // Molten Amber (Fiery copper bronze & golden amber)
   | 'mercury'   // Titanium Mercury (Liquid slate chrome with silver specular)
   | 'silk';     // Cashmere Silk (Pearl champagne & soft velvet)
@@ -37,7 +37,6 @@ interface FluidCanvasProps {
   intensity?: number;
   interactive?: boolean;
   mode?: FluidMode;
-  theme?: 'light' | 'dark';
 }
 
 const VERTEX_SHADER_SRC = `
@@ -57,7 +56,6 @@ uniform vec2 u_resolution;
 uniform float u_time;
 uniform float u_intensity;
 uniform int u_mode;
-uniform int u_is_light;
 uniform vec4 u_drops[64]; // xy: aspect pos, z: sigma (radius), w: intensity
 
 void main() {
@@ -118,93 +116,46 @@ void main() {
   vec3 rgb = vec3(1.0);
   float alpha = 0.0;
 
-  if (u_is_light == 1) {
-    // Light Theme: Refined Gentle Watercolor Absorption (Subtle & Elegant, Nerfed for Background Harmony)
-    float absorption = 1.0 - exp(-dye * 1.05);
-
-    if (u_mode == 0) {
-      // Titanium Mercury (Soft slate & liquid steel sheen)
-      rgb = mix(vec3(0.24, 0.32, 0.44), vec3(0.48, 0.58, 0.72), spec * 0.50);
-      rgb *= (diff * 0.20 + 0.80);
-      alpha = clamp((absorption * 0.46 + spec * 0.12 * dyeWeight) * u_intensity, 0.0, 0.52);
-    } else if (u_mode == 1) {
-      // Cashmere Silk (Warm soft roasted espresso & cashmere)
-      rgb = mix(vec3(0.38, 0.28, 0.20), vec3(0.62, 0.48, 0.36), spec * 0.45);
-      rgb *= (diff * 0.20 + 0.80);
-      alpha = clamp((absorption * 0.44 + spec * 0.12 * dyeWeight) * u_intensity, 0.0, 0.50);
-    } else if (u_mode == 2) {
-      // Molten Amber (Warm honey amber bronze)
-      rgb = mix(vec3(0.72, 0.30, 0.08), vec3(0.92, 0.52, 0.16), spec * 0.55);
-      rgb *= (diff * 0.20 + 0.80);
-      alpha = clamp((absorption * 0.48 + spec * 0.14 * dyeWeight) * u_intensity, 0.0, 0.52);
-    } else if (u_mode == 3) {
-      // Cobalt Ink (Classic sapphire fountain cyan)
-      rgb = mix(vec3(0.10, 0.32, 0.78), vec3(0.26, 0.58, 0.94), spec * 0.60);
-      rgb *= (diff * 0.20 + 0.80);
-      alpha = clamp((absorption * 0.50 + spec * 0.14 * dyeWeight) * u_intensity, 0.0, 0.54);
-    } else if (u_mode == 4) {
-      // Emerald Jade (Soft viridian mint)
-      rgb = mix(vec3(0.08, 0.48, 0.30), vec3(0.18, 0.74, 0.52), spec * 0.55);
-      rgb *= (diff * 0.20 + 0.80);
-      alpha = clamp((absorption * 0.48 + spec * 0.14 * dyeWeight) * u_intensity, 0.0, 0.52);
-    } else if (u_mode == 5) {
-      // Royal Amethyst (Soft orchid lavender)
-      rgb = mix(vec3(0.44, 0.16, 0.70), vec3(0.68, 0.32, 0.90), spec * 0.55);
-      rgb *= (diff * 0.20 + 0.80);
-      alpha = clamp((absorption * 0.48 + spec * 0.14 * dyeWeight) * u_intensity, 0.0, 0.52);
-    } else if (u_mode == 6) {
-      // Crimson Ruby (Rose Tuscan crimson)
-      rgb = mix(vec3(0.70, 0.14, 0.24), vec3(0.92, 0.32, 0.42), spec * 0.55);
-      rgb *= (diff * 0.20 + 0.80);
-      alpha = clamp((absorption * 0.48 + spec * 0.14 * dyeWeight) * u_intensity, 0.0, 0.52);
-    } else {
-      // Sumi Calligraphy Ink (Soft charcoal graphite tint)
-      rgb = mix(vec3(0.20, 0.22, 0.26), vec3(0.38, 0.42, 0.48), spec * 0.45);
-      rgb *= (diff * 0.20 + 0.80);
-      alpha = clamp((absorption * 0.46 + spec * 0.12 * dyeWeight) * u_intensity, 0.0, 0.50);
-    }
+  // Liquid Luminescence on Obsidian
+  if (u_mode == 0) {
+    // Liquid Mercury
+    rgb = mix(vec3(0.85, 0.90, 0.98), vec3(1.0, 1.0, 1.0), spec * 0.7);
+    rgb *= (diff * 0.35 + 0.65);
+    alpha = clamp((dye * 0.40 + spec * 0.28 * dyeWeight) * u_intensity, 0.0, 0.55);
+  } else if (u_mode == 1) {
+    // Pure Silk
+    rgb = vec3(0.92, 0.94, 0.98) * (diff * 0.22 + 0.78);
+    alpha = clamp((dye * 0.34 + spec * 0.15 * dyeWeight) * u_intensity, 0.0, 0.45);
+  } else if (u_mode == 2) {
+    // Obsidian Ember
+    rgb = mix(vec3(0.95, 0.60, 0.25), vec3(1.0, 0.90, 0.55), spec * 0.85);
+    rgb *= (diff * 0.4 + 0.6);
+    alpha = clamp((dye * 0.42 + spec * 0.32 * dyeWeight) * u_intensity, 0.0, 0.54);
+  } else if (u_mode == 3) {
+    // Cobalt Azure
+    rgb = mix(vec3(0.18, 0.52, 1.0), vec3(0.45, 0.88, 1.0), spec * 0.85);
+    rgb *= (diff * 0.35 + 0.65);
+    alpha = clamp((dye * 0.45 + spec * 0.32 * dyeWeight) * u_intensity, 0.0, 0.58);
+  } else if (u_mode == 4) {
+    // Emerald Jade
+    rgb = mix(vec3(0.08, 0.85, 0.55), vec3(0.45, 1.0, 0.80), spec * 0.85);
+    rgb *= (diff * 0.35 + 0.65);
+    alpha = clamp((dye * 0.42 + spec * 0.32 * dyeWeight) * u_intensity, 0.0, 0.55);
+  } else if (u_mode == 5) {
+    // Royal Amethyst
+    rgb = mix(vec3(0.70, 0.25, 1.0), vec3(0.95, 0.60, 1.0), spec * 0.85);
+    rgb *= (diff * 0.35 + 0.65);
+    alpha = clamp((dye * 0.45 + spec * 0.32 * dyeWeight) * u_intensity, 0.0, 0.58);
+  } else if (u_mode == 6) {
+    // Crimson Ruby
+    rgb = mix(vec3(1.0, 0.22, 0.42), vec3(1.0, 0.65, 0.75), spec * 0.85);
+    rgb *= (diff * 0.35 + 0.65);
+    alpha = clamp((dye * 0.45 + spec * 0.32 * dyeWeight) * u_intensity, 0.0, 0.58);
   } else {
-    // Dark Theme: Liquid Luminescence on Obsidian
-    if (u_mode == 0) {
-      // Liquid Mercury
-      rgb = mix(vec3(0.85, 0.90, 0.98), vec3(1.0, 1.0, 1.0), spec * 0.7);
-      rgb *= (diff * 0.35 + 0.65);
-      alpha = clamp((dye * 0.40 + spec * 0.28 * dyeWeight) * u_intensity, 0.0, 0.55);
-    } else if (u_mode == 1) {
-      // Pure Silk
-      rgb = vec3(0.92, 0.94, 0.98) * (diff * 0.22 + 0.78);
-      alpha = clamp((dye * 0.34 + spec * 0.15 * dyeWeight) * u_intensity, 0.0, 0.45);
-    } else if (u_mode == 2) {
-      // Obsidian Ember
-      rgb = mix(vec3(0.95, 0.60, 0.25), vec3(1.0, 0.90, 0.55), spec * 0.85);
-      rgb *= (diff * 0.4 + 0.6);
-      alpha = clamp((dye * 0.42 + spec * 0.32 * dyeWeight) * u_intensity, 0.0, 0.54);
-    } else if (u_mode == 3) {
-      // Cobalt Azure
-      rgb = mix(vec3(0.18, 0.52, 1.0), vec3(0.45, 0.88, 1.0), spec * 0.85);
-      rgb *= (diff * 0.35 + 0.65);
-      alpha = clamp((dye * 0.45 + spec * 0.32 * dyeWeight) * u_intensity, 0.0, 0.58);
-    } else if (u_mode == 4) {
-      // Emerald Jade
-      rgb = mix(vec3(0.08, 0.85, 0.55), vec3(0.45, 1.0, 0.80), spec * 0.85);
-      rgb *= (diff * 0.35 + 0.65);
-      alpha = clamp((dye * 0.42 + spec * 0.32 * dyeWeight) * u_intensity, 0.0, 0.55);
-    } else if (u_mode == 5) {
-      // Royal Amethyst
-      rgb = mix(vec3(0.70, 0.25, 1.0), vec3(0.95, 0.60, 1.0), spec * 0.85);
-      rgb *= (diff * 0.35 + 0.65);
-      alpha = clamp((dye * 0.45 + spec * 0.32 * dyeWeight) * u_intensity, 0.0, 0.58);
-    } else if (u_mode == 6) {
-      // Crimson Ruby
-      rgb = mix(vec3(1.0, 0.22, 0.42), vec3(1.0, 0.65, 0.75), spec * 0.85);
-      rgb *= (diff * 0.35 + 0.65);
-      alpha = clamp((dye * 0.45 + spec * 0.32 * dyeWeight) * u_intensity, 0.0, 0.58);
-    } else {
-      // Obsidian Charcoal
-      rgb = mix(vec3(0.45, 0.48, 0.55), vec3(0.85, 0.90, 0.98), spec * 0.8);
-      rgb *= (diff * 0.35 + 0.65);
-      alpha = clamp((dye * 0.40 + spec * 0.28 * dyeWeight) * u_intensity, 0.0, 0.52);
-    }
+    // Obsidian Charcoal
+    rgb = mix(vec3(0.45, 0.48, 0.55), vec3(0.85, 0.90, 0.98), spec * 0.8);
+    rgb *= (diff * 0.35 + 0.65);
+    alpha = clamp((dye * 0.40 + spec * 0.28 * dyeWeight) * u_intensity, 0.0, 0.52);
   }
 
   alpha *= edgeFade;
@@ -227,10 +178,9 @@ interface FluidDrop {
 }
 
 export default function FluidCanvas({
-  intensity = 1.0,
+  intensity = 0.85,
   interactive = true,
-  mode = 'cobalt',
-  theme = 'dark'
+  mode = 'cobalt'
 }: FluidCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -300,7 +250,6 @@ export default function FluidCanvas({
     const uTimeLoc = gl.getUniformLocation(program, 'u_time');
     const uIntensityLoc = gl.getUniformLocation(program, 'u_intensity');
     const uModeLoc = gl.getUniformLocation(program, 'u_mode');
-    const uIsLightLoc = gl.getUniformLocation(program, 'u_is_light');
     const uDropsLoc = gl.getUniformLocation(program, 'u_drops');
 
     // 64-Drop Continuous Fluid Ring Buffer
@@ -363,19 +312,18 @@ export default function FluidCanvas({
     // Click emits an expanding radial fluid splash
     const onClick = (e: MouseEvent) => {
       const pos = toAspectSpace(e.clientX, e.clientY);
-      const isLight = theme === 'light';
       for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 4) {
         dropHead = 1 + ((dropHead) % (MAX_DROPS - 1));
         drops[dropHead] = {
           x: pos.x,
           y: pos.y,
-          vx: Math.cos(angle) * 0.035,
-          vy: Math.sin(angle) * 0.035,
-          baseSigma: isLight ? 0.024 : 0.032,
-          sigma: isLight ? 0.024 : 0.032,
-          intensity: isLight ? 0.80 : 1.1,
+          vx: Math.cos(angle) * 0.038,
+          vy: Math.sin(angle) * 0.038,
+          baseSigma: 0.032,
+          sigma: 0.032,
+          intensity: 1.1,
           age: 0,
-          maxLife: isLight ? 0.9 : 1.2
+          maxLife: 1.2
         };
       }
     };
@@ -402,16 +350,15 @@ export default function FluidCanvas({
       const dist = Math.hypot(smoothMouseX - lastSpawnX, smoothMouseY - lastSpawnY);
       const minDim = Math.min(window.innerWidth, window.innerHeight);
 
-      // Smooth cursor activity envelope (active on motion, gracefully dissolves in light mode)
-      const isLight = theme === 'light';
+      // Smooth cursor activity envelope (active on motion, gracefully dissolves when idle)
       if (dist > 0.4) {
         cursorActive = Math.min(1.0, cursorActive + dt * 15.0);
       } else {
-        cursorActive = Math.max(0.0, cursorActive - dt * (isLight ? 2.5 : 2.2));
+        cursorActive = Math.max(0.0, cursorActive - dt * 2.2);
       }
 
       // 2. Sub-Step Continuous Deposition (tighter step dist ensures unbroken C^∞ continuity)
-      const stepDist = isLight ? 14 : 10;
+      const stepDist = 10;
       if (dist >= stepDist) {
         const steps = Math.min(Math.floor(dist / stepDist), 6);
         const speed = (dist / Math.max(dt, 0.001)) / minDim;
@@ -423,11 +370,11 @@ export default function FluidCanvas({
           const aspect = toAspectSpace(ix, iy);
 
           // Viscous drift velocity from cursor motion
-          const vx = ((smoothMouseX - lastSpawnX) / minDim) * (isLight ? 0.14 : 0.18);
-          const vy = -((smoothMouseY - lastSpawnY) / minDim) * (isLight ? 0.14 : 0.18);
+          const vx = ((smoothMouseX - lastSpawnX) / minDim) * 0.18;
+          const vy = -((smoothMouseY - lastSpawnY) / minDim) * 0.18;
 
-          // Sigma scales with stroke speed (nerfed light-mode radius for refined background presence)
-          const baseSigma = (isLight ? 0.024 : 0.030) + Math.min(speed * 0.012, 0.010);
+          // Sigma scales subtly with stroke speed
+          const baseSigma = 0.030 + Math.min(speed * 0.012, 0.010);
 
           // Cycle through trailing drops (1 to MAX_DROPS - 1)
           dropHead = 1 + ((dropHead) % (MAX_DROPS - 1));
@@ -438,9 +385,9 @@ export default function FluidCanvas({
             vy,
             baseSigma,
             sigma: baseSigma,
-            intensity: isMouseDown ? (isLight ? 0.95 : 1.3) : (isLight ? 0.70 : 0.95),
+            intensity: isMouseDown ? 1.3 : 0.95,
             age: 0,
-            maxLife: isLight ? 0.9 : 1.2
+            maxLife: 1.2
           };
         }
 
@@ -452,8 +399,8 @@ export default function FluidCanvas({
       const aspectCursor = toAspectSpace(smoothMouseX, smoothMouseY);
       dropsArray[0] = aspectCursor.x;
       dropsArray[1] = aspectCursor.y;
-      dropsArray[2] = isLight ? 0.025 : 0.032;
-      dropsArray[3] = cursorActive * (isMouseDown ? (isLight ? 0.95 : 1.3) : (isLight ? 0.70 : 0.95));
+      dropsArray[2] = 0.032;
+      dropsArray[3] = cursorActive * (isMouseDown ? 1.3 : 0.95);
 
       // 4. Update Trailing Drops (In-place advection, diffusion, and Hermite decay)
       for (let i = 1; i < MAX_DROPS; i++) {
@@ -476,7 +423,7 @@ export default function FluidCanvas({
 
         // Soft diffusion expansion
         const u = d.age / d.maxLife; // 0 to 1
-        d.sigma = d.baseSigma + (isLight ? 0.008 : 0.014) * u;
+        d.sigma = d.baseSigma + 0.014 * u;
 
         // Cubic Hermite ease-out decay
         const fade = 1.0 - u;
@@ -491,9 +438,7 @@ export default function FluidCanvas({
       // Set shader uniforms
       gl.uniform2f(uResLoc, width, height);
       gl.uniform1f(uTimeLoc, elapsed);
-      // Harmonized effective intensity in light mode for delicate watercolor balance
-      const effectiveIntensity = intensity * (isLight ? 0.75 : 1.0);
-      gl.uniform1f(uIntensityLoc, effectiveIntensity);
+      gl.uniform1f(uIntensityLoc, intensity);
 
       const modeCodeMap: Record<FluidMode, number> = {
         mercury: 0,
@@ -506,7 +451,6 @@ export default function FluidCanvas({
         obsidian: 7
       };
       gl.uniform1i(uModeLoc, modeCodeMap[mode] ?? 0);
-      gl.uniform1i(uIsLightLoc, isLight ? 1 : 0);
       gl.uniform4fv(uDropsLoc, dropsArray);
 
       // Render full-screen quad at native Retina resolution
@@ -529,7 +473,7 @@ export default function FluidCanvas({
       gl.deleteShader(fragShader);
       gl.deleteBuffer(quadBuffer);
     };
-  }, [intensity, interactive, mode, theme]);
+  }, [intensity, interactive, mode]);
 
   return (
     <canvas

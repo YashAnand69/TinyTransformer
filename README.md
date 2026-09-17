@@ -111,3 +111,35 @@ p5/
 ├── run.sh                            # Unified start script
 └── README.md
 ```
+
+## Netlify deployment
+
+Production: https://tinytransformer-yashanand.netlify.app
+
+Use Node.js 22.12 or newer. From the repository root:
+
+```bash
+npm ci
+npm run build
+npm test
+npx --package netlify-cli netlify deploy --prod --no-build
+```
+
+Netlify serves `frontend/dist` and routes `/api/*` to the TypeScript inference
+function. The function runs the original trained weights through ONNX Runtime
+on CPU; it does not require the local FastAPI server. Local Vite development
+continues to use `http://127.0.0.1:8008`. Set `VITE_API_BASE_URL` at build time
+only when using a different backend.
+
+The portable model is checked into `netlify/model/model.onnx`. After retraining,
+install `onnx` into the backend Python environment and regenerate it with:
+
+```bash
+backend/.venv/bin/python scripts/export_model.py
+npm test
+```
+
+The export script also regenerates the PyTorch reference outputs used to check
+logit and attention parity. Publish only `frontend/dist`; model and corpus assets
+are bundled privately with the function. This is a manual deployment; automatic
+GitHub deploys have not been configured.

@@ -1,0 +1,1 @@
+{"block_size": 128, "vocab_size": 81, "n_layer": 4, "n_head": 4, "d_model": 128, "dropout": 0.1, "bias": false, "parameters": 813184}

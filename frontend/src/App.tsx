@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Terminal,
   Activity,
@@ -17,98 +17,37 @@ import {
   Volume2,
   VolumeX,
   Droplets,
-  Eye,
-  Sun,
-  Moon
+  Eye
 } from 'lucide-react';
 
 import FluidCanvas, { type FluidMode } from './components/FluidCanvas';
 import GuidedExplainer from './components/GuidedExplainer';
-import PaintTransitionOverlay, { triggerPaintThemeTransition, type Theme } from './components/PaintTransition';
+import trainingReport from './data/training_history.json';
 import { MODEL_CODE, TRAIN_CODE } from './data/codebase';
 import { playTokenTick, playClick, setSoundEnabled } from './utils/audio';
 
-const API_BASE = 'http://127.0.0.1:8008';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://127.0.0.1:8008' : '');
 
-// Progression Scrubber Data
-const PROGRESSION_TIMELINE = [
-  {
-    step: 0,
-    loss: 2.857,
-    perplexity: 17.41,
-    phase: 'Random Gaussian Weights',
-    description: 'Initial state before any gradient updates. Characters are sampled with zero grammatical or phonemic coherence.',
-    sample: '???#00pgg!o0eNPywrr0!WP3..NPpk]](E?S...x!99_1209--$__499209??'
-  },
-  {
-    step: 200,
-    loss: 2.120,
-    perplexity: 8.33,
-    phase: 'Space & Bigram Emergence',
-    description: 'The causal attention heads begin discovering high-frequency ASCII whitespace and common vowels.',
-    sample: '=== LOG the an in of at re er te se on th in the an er se of ...'
-  },
-  {
-    step: 400,
-    loss: 1.412,
-    perplexity: 4.10,
-    phase: 'Proto-Word Morphology',
-    description: 'Learns sub-word stems, word boundary spacing, and basic capitalizations at line beginnings.',
-    sample: '=== LOG ENTRY: Thugrat by ithtion tonsthe alie of llemoby re the compu...'
-  },
-  {
-    step: 800,
-    loss: 0.742,
-    perplexity: 2.10,
-    phase: 'Dialogue Delimiters',
-    description: 'Discovers the User/Assistant turn-taking delimiters and structured colon formatting.',
-    sample: 'User: Who are you?\nAssistant: I am a transformer neural netwrk model...'
-  },
-  {
-    step: 1400,
-    loss: 0.231,
-    perplexity: 1.26,
-    phase: 'Domain Semantics & Grammar',
-    description: 'Acquires technical vocabulary (Query, Key, Value, scaled dot-product) and coherent punctuation.',
-    sample: 'User: What is attention?\nAssistant: Attention is the mechanism where Query and Key vectors calculate affinity...'
-  },
-  {
-    step: 2200,
-    loss: 0.0676,
-    perplexity: 1.07,
-    phase: 'Converged Expert State',
-    description: 'Near-optimal prediction confidence (perplexity 1.07). Produces flawless, grammatical, domain-expert responses.',
-    sample: 'User: Who are you?\nAssistant: I am TinyTransformer, an 813K parameter causal decoder language model built and trained completely from scratch in pure PyTorch.'
-  }
-];
-
-function getInitialAttention(text = 'User: Who are you?') {
-  const sampleTokens = text.slice(0, 16).split('').map((c) => (c === ' ' ? '␣' : c));
-  const N = sampleTokens.length;
-  const weights: number[][][][] = [];
-  for (let l = 0; l < 4; l++) {
-    const heads: number[][][] = [];
-    for (let h = 0; h < 4; h++) {
-      const mat: number[][] = [];
-      for (let i = 0; i < N; i++) {
-        const row: number[] = [];
-        let sum = 0;
-        for (let j = 0; j < N; j++) {
-          if (j > i) {
-            row.push(0);
-          } else {
-            const val = Math.exp((j === i ? 2.2 : 0.8) + Math.sin(l * 2 + h + i * 0.5 - j));
-            row.push(val);
-            sum += val;
-          }
-        }
-        mat.push(row.map((v) => (sum > 0 ? v / sum : 0)));
-      }
-      heads.push(mat);
-    }
-    weights.push(heads);
-  }
-  return { tokens: sampleTokens, weights, n_layer: 4, n_head: 4 };
+const summary = trainingReport.summary;
+const PROGRESSION_TIMELINE = trainingReport.sample_generations.map(sample => {
+  const point = trainingReport.history.reduce((best, item) => Math.abs(item.step - sample.step) < Math.abs(best.step - sample.step) ? item : best);
+  return { step: sample.step, loss: point.val_loss, perplexity: point.perplexity,
+    phase: sample.step === 0 ? 'Random initialization' : `Training step ${sample.step}`,
+    description: sample.note, sample: sample.sample };
+});
+const chartMax = Math.ceil(Math.max(...trainingReport.history.map(p => Math.max(p.train_loss, p.val_loss))));
+const lossPath = (key: 'train_loss' | 'val_loss') => trainingReport.history.map((p,i) => `${i ? 'L' : 'M'} ${40 + 740*p.step/summary.total_steps} ${200 - 180*p[key]/chartMax}`).join(' ');
+const formatPrompt = (text: string) => text.startsWith('User:') ? text : `User: ${text.trim()}\nAssistant: `;
+async function requestAPI(path: string, body?: unknown, signal?: AbortSignal) {
+  const timeout = AbortSignal.timeout(55000);
+  const response = await fetch(`${API_BASE}/api/${path}`, {
+    method: body === undefined ? 'GET' : 'POST',
+    headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
+    body: body === undefined ? undefined : JSON.stringify(body),
+    signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+  });
+  if (!response.ok) throw new Error(`Request failed (${response.status}). Please try again.`);
+  return response.json();
 }
 
 export default function App() {
@@ -129,35 +68,21 @@ export default function App() {
     localStorage.setItem('tinytransformer_fluid_mode', fluidMode);
   }, [fluidMode]);
 
-  // Theme Settings with localStorage and System Preference
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('tinytransformer_theme');
-      if (saved === 'light' || saved === 'dark') return saved;
-      if (window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
-    }
-    return 'dark';
-  });
-
+  // Permanent Dark Mode Setup
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('tinytransformer_theme', theme);
-  }, [theme]);
-
-  const handleToggleTheme = (e: React.MouseEvent) => {
-    const nextTheme: Theme = theme === 'dark' ? 'light' : 'dark';
-    triggerPaintThemeTransition(e, nextTheme, (t) => {
-      setTheme(t);
-    });
-  };
+    document.documentElement.setAttribute('data-theme', 'dark');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('tinytransformer_theme');
+    }
+  }, []);
 
   // Backend status
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
-  const [backendDevice, setBackendDevice] = useState<string>('MPS');
+  const [backendDevice, setBackendDevice] = useState<string>('CPU');
 
   // Playground State
   const [prompt, setPrompt] = useState<string>("User: Who are you?\nAssistant: ");
-  const [maxTokens, setMaxTokens] = useState<number>(110);
+  const [maxTokens, setMaxTokens] = useState<number>(220);
   const [temperature, setTemperature] = useState<number>(0.35);
   const [topK, setTopK] = useState<number>(10);
   const [topP, setTopP] = useState<number>(0.90);
@@ -173,116 +98,50 @@ export default function App() {
 
   // Attention State
   const [attnInput, setAttnInput] = useState<string>('User: Who are you?');
-  const [attnData, setAttnData] = useState<any>(() => getInitialAttention());
+  const [attnData, setAttnData] = useState<any>(null);
   const [selectedLayer, setSelectedLayer] = useState<number>(0);
   const [selectedHead, setSelectedHead] = useState<number>(0);
   const [isAttnLoading, setIsAttnLoading] = useState<boolean>(false);
   const [hoveredCell, setHoveredCell] = useState<{ qToken: string; kToken: string; score: number } | null>(null);
 
-  // Fetch Attention Weights
+  const [attentionError, setAttentionError] = useState('');
+  const attentionRequest = useRef(0);
   const fetchAttention = useCallback(async (text: string) => {
-    setIsAttnLoading(true);
+    const id = ++attentionRequest.current;
+    setIsAttnLoading(true); setAttentionError(''); setAttnData(null);
     try {
-      const res = await fetch(`${API_BASE}/api/attention`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (!data.weights && data.attention_weights) {
-          data.weights = data.attention_weights;
-        }
-        setAttnData(data);
-        setIsAttnLoading(false);
-        return;
-      }
-      throw new Error('Fallback matrix');
+      const data = await requestAPI('attention', { text });
+      if (id === attentionRequest.current) setAttnData(data);
     } catch {
-      const sampleTokens = text.slice(0, 16).split('').map((c) => (c === ' ' ? '␣' : c));
-      const N = sampleTokens.length;
-      const weights = [];
-      for (let l = 0; l < 4; l++) {
-        const heads = [];
-        for (let h = 0; h < 4; h++) {
-          const mat = [];
-          for (let i = 0; i < N; i++) {
-            const row = [];
-            let sum = 0;
-            for (let j = 0; j < N; j++) {
-              if (j > i) {
-                row.push(0);
-              } else {
-                const val = Math.exp(Math.random() * (j === i ? 2.5 : 1.0));
-                row.push(val);
-                sum += val;
-              }
-            }
-            mat.push(row.map((v) => (sum > 0 ? v / sum : 0)));
-          }
-          heads.push(mat);
-        }
-        weights.push(heads);
-      }
-      setAttnData({ tokens: sampleTokens, weights, n_layer: 4, n_head: 4 });
-      setIsAttnLoading(false);
+      if (id === attentionRequest.current) setAttentionError('Attention is unavailable. Start the backend or retry the request.');
+    } finally {
+      if (id === attentionRequest.current) setIsAttnLoading(false);
     }
   }, []);
 
   // Timeline Scrubber State
-  const [scrubberIndex, setScrubberIndex] = useState<number>(5);
+  const [scrubberIndex, setScrubberIndex] = useState<number>(PROGRESSION_TIMELINE.length - 1);
 
   // Code Tab state
   const [selectedCodeFile, setSelectedCodeFile] = useState<'model' | 'train'>('model');
   const [codeCopied, setCodeCopied] = useState<boolean>(false);
 
-  // Check backend health
   useEffect(() => {
+    const controller = new AbortController();
     async function checkHealth() {
       try {
-        const res = await fetch(`${API_BASE}/api/health`, { method: 'GET' });
-        if (res.ok) {
-          const data = await res.json();
-          setBackendOnline(true);
-          setBackendDevice(data.device?.toUpperCase() || 'MPS');
-        } else {
-          setBackendOnline(false);
+        const data = await requestAPI('health', undefined, controller.signal);
+        if (!controller.signal.aborted) {
+          setBackendOnline(Boolean(data.model_loaded));
+          setBackendDevice(data.device?.toUpperCase() || 'CPU');
         }
-      } catch {
-        setBackendOnline(false);
-      }
+      } catch { if (!controller.signal.aborted) setBackendOnline(false); }
     }
     checkHealth();
-    const interval = setInterval(checkHealth, 5000);
-    return () => clearInterval(interval);
+    const interval = setInterval(checkHealth, 30000);
+    return () => { controller.abort(); clearInterval(interval); };
   }, []);
-
-  // Fetch initial attention data on load
-  useEffect(() => {
-    let ignore = false;
-    async function loadInitialAttention() {
-      try {
-        const res = await fetch(`${API_BASE}/api/attention`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: 'User: Who are you?' })
-        });
-        if (res.ok && !ignore) {
-          const data = await res.json();
-          if (!data.weights && data.attention_weights) {
-            data.weights = data.attention_weights;
-          }
-          setAttnData(data);
-        }
-      } catch {
-        // Fallback precomputed attention already active
-      }
-    }
-    loadInitialAttention();
-    return () => {
-      ignore = true;
-    };
-  }, []);
+  useEffect(() => { fetchAttention('User: Who are you?'); }, [fetchAttention]);
 
   const toggleSound = () => {
     const next = !soundActive;
@@ -300,134 +159,61 @@ export default function App() {
     { label: 'Why train from scratch?', text: 'User: Why train from scratch instead of fine-tuning?\nAssistant: ' },
   ];
 
-  // Full Autoregressive Generation
-  const handleGenerate = async () => {
-    if (isGenerating || isStepping) return;
-    playClick(520, 0.04);
-    setIsGenerating(true);
-    setStreamingText('');
-    setStepDetails([]);
-    setSelectedStepIndex(null);
-
+  const [generationError, setGenerationError] = useState('');
+  const [seed, setSeed] = useState('42');
+  const generationRequest = useRef<AbortController | null>(null);
+  const animation = useRef<number | null>(null);
+  const stopGeneration = () => {
+    generationRequest.current?.abort();
+    if (animation.current !== null) cancelAnimationFrame(animation.current);
+    setIsGenerating(false); setIsStepping(false);
+  };
+  useEffect(() => () => {
+    generationRequest.current?.abort();
+    if (animation.current !== null) cancelAnimationFrame(animation.current);
+  }, []);
+  const runGeneration = async (single: boolean) => {
+    if (isGenerating || isStepping || !prompt.trim()) return;
+    if (seed && (!/^\d+$/.test(seed) || Number(seed) > 4294967295)) {
+      setGenerationError('Seed must be a whole number from 0 to 4294967295, or blank.'); return;
+    }
+    const controller = new AbortController(); generationRequest.current = controller;
+    setGenerationError(''); playClick(520, 0.04);
+    if (single) setIsStepping(true);
+    else { setIsGenerating(true); setStreamingText(''); setStepDetails([]); setGenerationStats(null); setSelectedStepIndex(null); }
     try {
-      if (backendOnline) {
-        const res = await fetch(`${API_BASE}/api/generate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            prompt,
-            max_new_tokens: maxTokens,
-            temperature,
-            top_k: topK,
-            top_p: topP
-          })
-        });
-
-        if (!res.ok) throw new Error('API request failed');
-        const data = await res.json();
-
-        setGenerationStats({
-          latency_ms: data.latency_ms,
-          tokens_per_sec: data.tokens_per_sec,
-          tokens_generated: data.tokens_generated
-        });
-        const details = data.step_details || [];
-        setStepDetails(details);
-
-        const full = data.generated_text;
-        let currentIndex = 0;
-        let lastTime = performance.now();
-        const charsPerMs = Math.max(0.045, Math.min(0.085, full.length / 1400));
-
-        const streamFrame = (now: number) => {
-          const delta = now - lastTime;
-          const charsToAdd = Math.floor(delta * charsPerMs);
-          if (charsToAdd > 0) {
-            lastTime = now;
-            currentIndex = Math.min(full.length, currentIndex + charsToAdd);
-            setStreamingText(full.slice(0, currentIndex));
-            playTokenTick(currentIndex);
-          }
-          if (currentIndex < full.length) {
-            requestAnimationFrame(streamFrame);
-          } else {
-            setIsGenerating(false);
-          }
-        };
-        requestAnimationFrame(streamFrame);
+      const data = await requestAPI('generate', {
+        prompt: formatPrompt(prompt) + (single ? streamingText : ''),
+        max_new_tokens: single ? 1 : maxTokens, temperature, top_k: topK, top_p: topP,
+        seed: seed === '' ? undefined : Number(seed),
+      }, controller.signal);
+      if (controller.signal.aborted) return;
+      setBackendOnline(true);
+      setGenerationStats({latency_ms:data.latency_ms,tokens_per_sec:data.tokens_per_sec,tokens_generated:data.tokens_generated});
+      if (single) {
+        setStreamingText(prev => prev + data.generated_text);
+        setStepDetails(prev => [...prev, ...(data.step_details || [])]);
+        setIsStepping(false);
       } else {
-        // Fallback sample if offline
-        await new Promise((r) => setTimeout(r, 200));
-        let fallback = ' I am TinyTransformer, an 813K parameter causal decoder language model built and trained completely from scratch in pure PyTorch.';
-        if (prompt.includes('attention')) {
-          fallback = ' Attention is the mechanism where Query and Key vectors calculate dot-product affinity to dynamically weigh Value vectors across tokens.';
-        } else if (prompt.includes('transmutation')) {
-          fallback = ' Silicon transmutation is the fundamental law of computing: transmuting electrical entropy through microscopic transistors into structured information.';
-        }
-        setStreamingText(fallback);
-        setGenerationStats({ latency_ms: 78, tokens_per_sec: 82, tokens_generated: 38 });
-        setIsGenerating(false);
+        setStepDetails(data.step_details || []);
+        const start = performance.now();
+        const streamFrame = (now: number) => {
+          if (controller.signal.aborted) return;
+          const count = Math.min(data.generated_text.length, Math.floor((now-start)*0.14));
+          setStreamingText(data.generated_text.slice(0,count));
+          if (count < data.generated_text.length) animation.current = requestAnimationFrame(streamFrame);
+          else { setIsGenerating(false); animation.current = null; }
+        };
+        animation.current = requestAnimationFrame(streamFrame);
       }
-    } catch (err) {
-      console.warn('Backend unavailable, using fallback', err);
-      setBackendOnline(false);
-      const fallback = ' I am TinyTransformer, an 813K parameter causal decoder language model built and trained completely from scratch in pure PyTorch.';
-      setStreamingText(fallback);
-      setGenerationStats({ latency_ms: 80, tokens_per_sec: 75, tokens_generated: 36 });
-      setIsGenerating(false);
+    } catch (error) {
+      if (controller.signal.aborted) return;
+      setGenerationError(error instanceof Error ? error.message : 'Generation failed. Please retry.');
+      setIsGenerating(false); setIsStepping(false);
     }
   };
-
-  // Step-by-Step Single Token Generation
-  const handleStepToken = async () => {
-    if (isGenerating || isStepping) return;
-    playClick(680, 0.03);
-    setIsStepping(true);
-
-    const currentContext = prompt + streamingText;
-
-    try {
-      if (backendOnline) {
-        const res = await fetch(`${API_BASE}/api/generate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            prompt: currentContext,
-            max_new_tokens: 1,
-            temperature,
-            top_k: topK,
-            top_p: topP
-          })
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          const newChar = data.generated_text;
-          const newStep = data.step_details?.[0];
-
-          setStreamingText((prev) => prev + newChar);
-          if (newStep) {
-            setStepDetails((prev) => {
-              const updated = [...prev, newStep];
-              setSelectedStepIndex(updated.length - 1);
-              return updated;
-            });
-          }
-          playTokenTick(streamingText.length + 1);
-          setIsStepping(false);
-          return;
-        }
-      }
-      // Fallback stepping
-      const fallbackChars = [' ', 'a', 'n', 'd', ' ', 's', 'i', 'l', 'i', 'c', 'o', 'n'];
-      const nextChar = fallbackChars[streamingText.length % fallbackChars.length];
-      setStreamingText((prev) => prev + nextChar);
-      playTokenTick(streamingText.length + 1);
-      setIsStepping(false);
-    } catch {
-      setIsStepping(false);
-    }
-  };
+  const handleGenerate = () => runGeneration(false);
+  const handleStepToken = () => runGeneration(true);
 
   // Steer generation by manually clicking a candidate token
   const handleChooseCandidate = (char: string) => {
@@ -488,18 +274,15 @@ export default function App() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-      {/* Liquid Paint Ripple Wave Screen Fill Overlay */}
-      <PaintTransitionOverlay />
-
       {/* 3D Specular Navier-Stokes Fluid Dynamics Canvas (Layered in Background) */}
-      <FluidCanvas intensity={theme === 'light' ? 0.70 : 0.85} mode={fluidMode} theme={theme} />
+      <FluidCanvas intensity={0.85} mode={fluidMode} />
 
       {/* Clean Minimalist Header */}
       <header className="app-header">
         <div className="container header-inner">
           <div className="brand-group">
             <span className="brand-title">TinyTransformer</span>
-            <span className="badge-tag">813K Params</span>
+            <span className="badge-tag">{(summary.parameters / 1e6).toFixed(2)}M Params</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
               <span style={{
                 width: '6px',
@@ -508,7 +291,7 @@ export default function App() {
                 backgroundColor: backendOnline ? '#22c55e' : '#f59e0b',
                 display: 'inline-block'
               }} />
-              <span>{backendOnline ? `${backendDevice} Active` : 'Local Engine'}</span>
+              <span>{backendOnline ? `${backendDevice} Active` : backendOnline === null ? 'Connecting…' : 'Engine Offline'}</span>
             </div>
           </div>
 
@@ -590,20 +373,6 @@ export default function App() {
               {soundActive ? <Volume2 size={13} /> : <VolumeX size={13} />}
             </button>
 
-            {/* Dynamic Theme Switch with Paint-Filling Screen Transition */}
-            <button
-              className="theme-toggle-btn"
-              onClick={handleToggleTheme}
-              title={theme === 'dark' ? 'Switch to Light Mode (Paint Fill)' : 'Switch to Dark Mode (Paint Fill)'}
-              aria-label="Toggle light and dark theme"
-            >
-              {theme === 'dark' ? (
-                <Sun size={14} className="theme-toggle-icon" />
-              ) : (
-                <Moon size={14} className="theme-toggle-icon" />
-              )}
-            </button>
-
             {/* Explainer Guide */}
             <button
               className="btn-secondary"
@@ -623,6 +392,7 @@ export default function App() {
         {/* ====================================================================
             TAB 1: PLAYGROUND (STEPPING, PROBABILITIES, STEERING)
             ==================================================================== */}
+        <p className="model-notice">A small model trained from scratch on a narrow teaching curriculum. Outputs can be wrong; token confidence is not factual certainty.</p>
         {activeTab === 'playground' && (
           <div className="tab-pane">
             <div className="two-col-grid">
@@ -662,6 +432,9 @@ export default function App() {
                     </span>
                   </div>
                   <textarea
+                    aria-label="Input prompt"
+                    maxLength={4096}
+                    disabled={isGenerating || isStepping}
                     className="textarea-clean"
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
@@ -669,11 +442,16 @@ export default function App() {
                     rows={4}
                     placeholder="User: Ask a question...&#10;Assistant: "
                   />
+                  <div style={{fontSize:'.74rem',color:'var(--text-tertiary)',marginTop:'.5rem'}}>
+                    {Array.from(formatPrompt(prompt)).length} characters · {summary.block_size}-character context
+                    {Array.from(formatPrompt(prompt)).length > summary.block_size && ' · Older context will be cropped'}
+                  </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.85rem' }}>
                     <button
                       className="btn-secondary"
                       onClick={() => {
                         playClick(440, 0.03);
+                        stopGeneration(); setGenerationError(''); setGenerationStats(null);
                         setPrompt('');
                         setStreamingText('');
                         setStepDetails([]);
@@ -685,6 +463,7 @@ export default function App() {
                     </button>
 
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      {(isGenerating || isStepping) && <button className="btn-secondary" onClick={stopGeneration}>Stop</button>}
                       {/* Step Single Token Button */}
                       <button
                         className="btn-secondary"
@@ -710,6 +489,7 @@ export default function App() {
                   </div>
                 </div>
 
+                {generationError && <div className="card" role="alert" style={{color:'#fca5a5'}}>{generationError}</div>}
                 {/* Output Panel with Confidence View Toggle */}
                 <div className="card" style={{ padding: '1.25rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
@@ -998,7 +778,7 @@ export default function App() {
                           setTemperature(0.35);
                           setTopK(10);
                           setTopP(0.90);
-                          setMaxTokens(110);
+                          setMaxTokens(220);
                         }}
                       >
                         Reset to recommended defaults
@@ -1008,6 +788,11 @@ export default function App() {
                   </div>
                 </div>
 
+                <div className="card">
+                  <label htmlFor="sampling-seed" style={{display:'block',marginBottom:'.5rem'}}>Sampling seed</label>
+                  <input id="sampling-seed" className="textarea-clean" style={{minHeight:'auto'}} value={seed} onChange={e=>setSeed(e.target.value)} inputMode="numeric" placeholder="Blank for random" />
+                  <p style={{fontSize:'.75rem',color:'var(--text-tertiary)',marginTop:'.5rem'}}>Repeat a prompt with the same settings and seed to reproduce a response on the same engine.</p>
+                </div>
                 {/* Model Info Card */}
                 <div className="card">
                   <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
@@ -1020,7 +805,7 @@ export default function App() {
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ color: 'var(--text-tertiary)' }}>Parameters</span>
-                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>813,184</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>{summary.parameters.toLocaleString()}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ color: 'var(--text-tertiary)' }}>Layers & Heads</span>
@@ -1028,11 +813,11 @@ export default function App() {
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ color: 'var(--text-tertiary)' }}>Context Window</span>
-                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>128 Tokens</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>{summary.block_size} Characters</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ color: 'var(--text-tertiary)' }}>Hardware</span>
-                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>Apple Silicon (MPS)</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>{summary.device.toUpperCase()} training</span>
                     </div>
                   </div>
                 </div>
@@ -1052,28 +837,28 @@ export default function App() {
             <div className="kpi-grid">
               <div className="kpi-card">
                 <div className="kpi-label">Best Validation Loss</div>
-                <div className="kpi-value">0.0676</div>
+                <div className="kpi-value">{summary.best_val_loss}</div>
                 <div style={{ fontSize: '0.72rem', color: '#10b981', marginTop: '0.2rem' }}>
-                  ↓ 97.6% error reduction
+                  Held-out question phrasings
                 </div>
               </div>
               <div className="kpi-card">
                 <div className="kpi-label">Validation Perplexity</div>
-                <div className="kpi-value">1.07</div>
+                <div className="kpi-value">{Math.exp(summary.best_val_loss).toFixed(2)}</div>
                 <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: '0.2rem' }}>
-                  e^loss (near-optimal)
+                  exp(validation loss)
                 </div>
               </div>
               <div className="kpi-card">
                 <div className="kpi-label">Trainable Parameters</div>
-                <div className="kpi-value">813,184</div>
+                <div className="kpi-value">{summary.parameters.toLocaleString()}</div>
                 <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: '0.2rem' }}>
                   Float32 weights & biases
                 </div>
               </div>
               <div className="kpi-card">
                 <div className="kpi-label">Total Optimization Steps</div>
-                <div className="kpi-value">2,200</div>
+                <div className="kpi-value">{summary.total_steps.toLocaleString()}</div>
                 <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: '0.2rem' }}>
                   Cosine learning rate schedule
                 </div>
@@ -1092,7 +877,7 @@ export default function App() {
                   </p>
                 </div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--text-primary)' }}>
-                  Step {currentScrubberItem.step} / 2200
+                  Step {currentScrubberItem.step} / {summary.total_steps}
                 </div>
               </div>
 
@@ -1150,7 +935,7 @@ export default function App() {
                     Convergence Trajectory (Train Loss vs. Validation Loss)
                   </h3>
                   <p style={{ fontSize: '0.76rem', color: 'var(--text-tertiary)' }}>
-                    Tracking loss from random initialization down to 0.0676
+                    Measured answer-token loss at each evaluation step
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', fontSize: '0.75rem' }}>
@@ -1173,21 +958,21 @@ export default function App() {
                   <line x1="40" y1="140" x2="780" y2="140" stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" />
                   <line x1="40" y1="200" x2="780" y2="200" stroke="rgba(255,255,255,0.12)" />
 
-                  <text x="32" y="24" fill="#71717a" fontSize="10" textAnchor="end" fontFamily="monospace">3.0</text>
-                  <text x="32" y="84" fill="#71717a" fontSize="10" textAnchor="end" fontFamily="monospace">2.0</text>
-                  <text x="32" y="144" fill="#71717a" fontSize="10" textAnchor="end" fontFamily="monospace">1.0</text>
+                  <text x="32" y="24" fill="#71717a" fontSize="10" textAnchor="end" fontFamily="monospace">{chartMax}</text>
+                  <text x="32" y="84" fill="#71717a" fontSize="10" textAnchor="end" fontFamily="monospace">{(chartMax*2/3).toFixed(1)}</text>
+                  <text x="32" y="144" fill="#71717a" fontSize="10" textAnchor="end" fontFamily="monospace">{(chartMax/3).toFixed(1)}</text>
                   <text x="32" y="204" fill="#71717a" fontSize="10" textAnchor="end" fontFamily="monospace">0.0</text>
 
                   {/* Train Curve */}
                   <path
-                    d="M 50 30 Q 150 140, 280 180 T 520 195 T 770 198"
+                    d={lossPath('train_loss')}
                     fill="none"
                     stroke="#3b82f6"
                     strokeWidth="2.5"
                   />
                   {/* Val Curve */}
                   <path
-                    d="M 50 35 Q 160 145, 290 184 T 530 196 T 770 198"
+                    d={lossPath('val_loss')}
                     fill="none"
                     stroke="#10b981"
                     strokeWidth="2.5"
@@ -1264,6 +1049,8 @@ export default function App() {
                   type="text"
                   className="textarea-clean"
                   style={{ minHeight: 'auto', padding: '0.5rem 0.85rem' }}
+                  aria-label="Text to analyze for attention"
+                  maxLength={32}
                   value={attnInput}
                   onChange={(e) => setAttnInput(e.target.value)}
                   placeholder="Text to analyze..."
@@ -1280,6 +1067,8 @@ export default function App() {
                 </button>
               </div>
 
+              {attentionError && <p role="alert" style={{color:'#fca5a5'}}>{attentionError}</p>}
+              {isAttnLoading && <p role="status">Computing attention from the trained model…</p>}
               {/* Heatmap Grid */}
               {attnData && (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', overflowX: 'auto', padding: '1rem 0' }}>
@@ -1397,7 +1186,7 @@ export default function App() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.4rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Total Parameters</span>
-                    <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>813,184</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>{summary.parameters.toLocaleString()}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.4rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Transformer Blocks</span>
@@ -1409,7 +1198,7 @@ export default function App() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.4rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Model Dimension (d_model)</span>
-                    <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>128</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>{summary.d_model}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.4rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Feed-Forward Expansion (d_mlp)</span>
@@ -1417,11 +1206,11 @@ export default function App() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.4rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Context Window (block_size)</span>
-                    <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>128 Tokens</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>{summary.block_size} Characters</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.4rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Vocabulary Size</span>
-                    <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>86 Characters</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>{summary.vocab_size} Tokens</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Activation & Norm</span>

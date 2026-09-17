@@ -1,0 +1,17 @@
+[build]
+  command = "npm run build"
+  publish = "frontend/dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+  external_node_modules = ["onnxruntime-web"]
+  included_files = ["netlify/model/**", "backend/data/*.json", "backend/data/corpus.txt", "backend/checkpoints/training_history.json"]
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,83 +1,36 @@
-#!/bin/bash
-# ==============================================================================
-# TinyTransformer LM: Unified Launch & Process Manager
-# Starts the PyTorch FastAPI inference engine and Vite React web dashboard
-# ==============================================================================
-
-set -e
-
+#!/usr/bin/env bash
+set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BACKEND_DIR="$PROJECT_DIR/backend"
-FRONTEND_DIR="$PROJECT_DIR/frontend"
-
-echo "============================================================"
-echo "⚡ TinyTransformer LM — Launching Full-Stack Services"
-echo "============================================================"
-
-# Function to clean up background processes on exit
+BACKEND_PID=""
+FRONTEND_PID=""
 cleanup() {
-  echo ""
-  echo "🛑 Stopping TinyTransformer services..."
-  if [ -n "$BACKEND_PID" ]; then
-    kill "$BACKEND_PID" 2>/dev/null || true
-  fi
-  if [ -n "$FRONTEND_PID" ]; then
-    kill "$FRONTEND_PID" 2>/dev/null || true
-  fi
-  exit 0
+  trap - EXIT INT TERM
+  if [[ -n "$BACKEND_PID" ]]; then kill "$BACKEND_PID" 2>/dev/null || true; fi
+  if [[ -n "$FRONTEND_PID" ]]; then kill "$FRONTEND_PID" 2>/dev/null || true; fi
 }
-
-trap cleanup SIGINT SIGTERM EXIT
-
-# 1. Check and clear any existing stale processes on ports 8008 and 5173
-OLD_BACKEND=$(lsof -t -i:8008 2>/dev/null || true)
-if [ -n "$OLD_BACKEND" ]; then
-  echo "⚠️ Port 8008 is in use (PID: $OLD_BACKEND). Clearing stale process..."
-  kill -9 $OLD_BACKEND 2>/dev/null || true
-  sleep 1
-fi
-
-OLD_FRONTEND=$(lsof -t -i:5173 2>/dev/null || true)
-if [ -n "$OLD_FRONTEND" ]; then
-  echo "⚠️ Port 5173 is in use (PID: $OLD_FRONTEND). Clearing stale process..."
-  kill -9 $OLD_FRONTEND 2>/dev/null || true
-  sleep 1
-fi
-
-# 2. Launch FastAPI Inference Server
-echo "🚀 [1/2] Starting Backend Inference API on http://127.0.0.1:8008..."
-cd "$BACKEND_DIR"
-"$BACKEND_DIR/.venv/bin/python" -m uvicorn server:app --host 127.0.0.1 --port 8008 --log-level warning &
-BACKEND_PID=$!
-
-# Wait for backend to be healthy
-echo "   Waiting for model weights to load on MPS/Metal..."
-for i in {1..15}; do
-  if curl -s http://127.0.0.1:8008/api/health >/dev/null 2>&1; then
-    echo "   ✅ Backend online! PyTorch model loaded successfully."
-    break
+trap cleanup EXIT INT TERM
+cd "$PROJECT_DIR"
+node -e 'const [a,b]=process.versions.node.split(".").map(Number); if(a<22 || (a===22 && b<12)) {console.error("Node 22.12+ is required. Use nvm use after installing Node 22."); process.exit(1)}'
+for port in 8008 5173; do
+  if lsof -tiTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
+    echo "Port $port is already in use. Stop that service or choose another port." >&2
+    exit 1
   fi
-  sleep 0.5
 done
-
-# 3. Launch Vite Frontend
-echo "🚀 [2/2] Starting Frontend UI on http://127.0.0.1:5173..."
-cd "$FRONTEND_DIR"
-npm run dev -- --host 127.0.0.1 --port 5173 --clearScreen false &
+if [[ ! -x backend/.venv/bin/python ]]; then
+  echo "Create backend/.venv and install backend/requirements.txt first. See README.md." >&2
+  exit 1
+fi
+(cd backend && exec .venv/bin/python -m uvicorn server:app --host 127.0.0.1 --port 8008) &
+BACKEND_PID=$!
+ready=false
+for i in {1..60}; do
+  if curl -fsS http://127.0.0.1:8008/api/health 2>/dev/null | python3 -c 'import json,sys;sys.exit(not json.load(sys.stdin)["model_loaded"])' 2>/dev/null; then ready=true; break; fi
+  if ! kill -0 "$BACKEND_PID" 2>/dev/null; then echo "Backend exited." >&2; exit 1; fi
+  sleep .5
+done
+if [[ "$ready" != true ]]; then echo "Backend failed its health check." >&2; exit 1; fi
+(cd frontend && exec npm run dev -- --host 127.0.0.1 --port 5173 --strictPort) &
 FRONTEND_PID=$!
-
-# Wait briefly for Vite dev server
-sleep 1.5
-
-echo ""
-echo "============================================================"
-echo "✨ TinyTransformer LM is LIVE and Ready!"
-echo "   - Web Dashboard: [http://127.0.0.1:5173](http://127.0.0.1:5173)"
-echo "   - Inference API: [http://127.0.0.1:8008](http://127.0.0.1:8008)"
-echo "   - Swagger Docs:  [http://127.0.0.1:8008/docs](http://127.0.0.1:8008/docs)"
-echo "============================================================"
-echo "💡 Press Ctrl+C at any time to gracefully terminate both servers."
-echo ""
-
-# Keep running until Ctrl+C
-wait
+echo "TinyTransformer: http://127.0.0.1:5173 | API: http://127.0.0.1:8008/docs"
+wait "$FRONTEND_PID"

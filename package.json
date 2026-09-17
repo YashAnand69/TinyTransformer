@@ -1,0 +1,16 @@
+{
+  "name": "tinytransformer-netlify",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm --prefix frontend ci && npm --prefix frontend run build",
+    "test": "node --experimental-strip-types --test scripts/inference.test.mts"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "@netlify/functions": "^6.0.0",
+    "onnxruntime-web": "1.22.0"
+  }
+}

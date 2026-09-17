@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "source": "Original synthetic educational curriculum maintained in curriculum.py",
+  "evaluation_scope": "Held-out question phrasings of known topics; not unseen-topic generalization.",
+  "topics": 58,
+  "counts": {
+    "train": 348,
+    "validation": 58,
+    "test": 58
+  },
+  "sha256": {
+    "train": "ffd81ede6b5ab6faee3c9be54ebf0cd747ee8649b655c29150b90acddf34e49c",
+    "validation": "01b2286662163549810baf5bb48e1814d9240cdccc6b3fc83c409007f8cbfa5a",
+    "test": "20d198f639c373d3fa85f752ed82b4d5bc788ac2a2979e4144b97f435e06b796"
+  }
+}
