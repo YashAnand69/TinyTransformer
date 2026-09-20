@@ -1,0 +1,234 @@
+[
+  {
+    "topic": "identity",
+    "question": "Who are you?"
+  },
+  {
+    "topic": "architecture",
+    "question": "What is your architecture?"
+  },
+  {
+    "topic": "attention",
+    "question": "What is attention?"
+  },
+  {
+    "topic": "generation",
+    "question": "How do you generate text?"
+  },
+  {
+    "topic": "temperature",
+    "question": "What is sampling temperature?"
+  },
+  {
+    "topic": "top-k",
+    "question": "What is top-k sampling?"
+  },
+  {
+    "topic": "top-p",
+    "question": "What is top-p sampling?"
+  },
+  {
+    "topic": "causal mask",
+    "question": "What is the causal mask?"
+  },
+  {
+    "topic": "training from scratch",
+    "question": "Why train from scratch instead of fine-tuning?"
+  },
+  {
+    "topic": "backpropagation",
+    "question": "What is backpropagation?"
+  },
+  {
+    "topic": "context window",
+    "question": "What is a context window?"
+  },
+  {
+    "topic": "tokenization",
+    "question": "What is tokenization?"
+  },
+  {
+    "topic": "embeddings",
+    "question": "What are embeddings?"
+  },
+  {
+    "topic": "position embeddings",
+    "question": "What are position embeddings?"
+  },
+  {
+    "topic": "queries",
+    "question": "What is a query vector?"
+  },
+  {
+    "topic": "keys",
+    "question": "What is a key vector?"
+  },
+  {
+    "topic": "values",
+    "question": "What is a value vector?"
+  },
+  {
+    "topic": "multiple heads",
+    "question": "Why use multiple attention heads?"
+  },
+  {
+    "topic": "scaled dot products",
+    "question": "Why scale attention scores?"
+  },
+  {
+    "topic": "softmax",
+    "question": "What is softmax?"
+  },
+  {
+    "topic": "logits",
+    "question": "What are logits?"
+  },
+  {
+    "topic": "cross entropy",
+    "question": "What is cross-entropy loss?"
+  },
+  {
+    "topic": "perplexity",
+    "question": "What is perplexity?"
+  },
+  {
+    "topic": "validation",
+    "question": "What is a validation set?"
+  },
+  {
+    "topic": "data leakage",
+    "question": "What is data leakage?"
+  },
+  {
+    "topic": "overfitting",
+    "question": "What is overfitting?"
+  },
+  {
+    "topic": "dropout",
+    "question": "What is dropout?"
+  },
+  {
+    "topic": "layer normalization",
+    "question": "What is layer normalization?"
+  },
+  {
+    "topic": "residual connections",
+    "question": "What are residual connections?"
+  },
+  {
+    "topic": "GELU",
+    "question": "What is GELU?"
+  },
+  {
+    "topic": "feed-forward network",
+    "question": "What is the feed-forward network?"
+  },
+  {
+    "topic": "AdamW",
+    "question": "What is AdamW?"
+  },
+  {
+    "topic": "learning rate",
+    "question": "What is the learning rate?"
+  },
+  {
+    "topic": "warmup",
+    "question": "Why use learning rate warmup?"
+  },
+  {
+    "topic": "cosine decay",
+    "question": "What is cosine learning rate decay?"
+  },
+  {
+    "topic": "gradient clipping",
+    "question": "What is gradient clipping?"
+  },
+  {
+    "topic": "weight decay",
+    "question": "What is weight decay?"
+  },
+  {
+    "topic": "weight tying",
+    "question": "What is weight tying?"
+  },
+  {
+    "topic": "batch size",
+    "question": "What is batch size?"
+  },
+  {
+    "topic": "checkpoint",
+    "question": "What is a checkpoint?"
+  },
+  {
+    "topic": "random seed",
+    "question": "Why use a random seed?"
+  },
+  {
+    "topic": "inference",
+    "question": "What is inference?"
+  },
+  {
+    "topic": "ONNX",
+    "question": "What is ONNX?"
+  },
+  {
+    "topic": "CPU and GPU",
+    "question": "How do CPUs and GPUs differ?"
+  },
+  {
+    "topic": "MPS",
+    "question": "What is MPS?"
+  },
+  {
+    "topic": "hallucination",
+    "question": "What is a hallucination?"
+  },
+  {
+    "topic": "limitations",
+    "question": "What are your limitations?"
+  },
+  {
+    "topic": "reasoning",
+    "question": "Can you solve any problem?"
+  },
+  {
+    "topic": "privacy",
+    "question": "Do you remember my messages?"
+  },
+  {
+    "topic": "end token",
+    "question": "What is an end token?"
+  },
+  {
+    "topic": "greedy decoding",
+    "question": "What is greedy decoding?"
+  },
+  {
+    "topic": "attention interpretation",
+    "question": "Do attention weights explain everything?"
+  },
+  {
+    "topic": "training data",
+    "question": "What were you trained on?"
+  },
+  {
+    "topic": "silicon transmutation",
+    "question": "What is silicon transmutation?"
+  },
+  {
+    "topic": "fine-tuning",
+    "question": "What is fine-tuning?"
+  },
+  {
+    "topic": "generalization",
+    "question": "What is generalization?"
+  },
+  {
+    "topic": "training mode",
+    "question": "Why switch between train and eval mode?"
+  },
+  {
+    "topic": "parameter count",
+    "question": "Does a larger model always work better?"
+  }
+]

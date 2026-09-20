@@ -1,0 +1,302 @@
+{
+  "loss": 0.019023002591380667,
+  "perplexity": 1.01920509270605,
+  "parameters": 1838016,
+  "block_size": 256,
+  "exact_matches": 26,
+  "total_prompts": 58,
+  "exact_match_rate": 0.4482758620689655,
+  "samples": [
+    {
+      "prompt": "User: Could you explain identity in a few sentences?\nAssistant: ",
+      "expected": "I am TinyTransformer, a small language model trained from scratch. I explain machine learning concepts. I can make mistakes and I am not a general-purpose assistant.",
+      "generated": "I am TinyTransformer, a small language model trained from scratch. I explain machine learning concepts. I can make mistakes and I am not a general-purpose assistant."
+    },
+    {
+      "prompt": "User: Could you explain architecture in a few sentences?\nAssistant: ",
+      "expected": "I use four causal transformer layers, four attention heads, 192 embedding dimensions, and a 256-character context window. My weights are learned from random initialization.",
+      "generated": "I use four causal transformer layers, four attention heads, 192 embedding dimensions, and a 256-character context window. My weights are learned from random initialization."
+    },
+    {
+      "prompt": "User: Could you explain attention in a few sentences?\nAssistant: ",
+      "expected": "Attention computes similarities between queries and keys, then uses normalized scores to combine value vectors. The result lets each token use relevant earlier context.",
+      "generated": "Attention computes similarities between queries and keys, then uses normalized scores to combine value vectors. The result lets each token use relevant earlier context."
+    },
+    {
+      "prompt": "User: Could you explain generation in a few sentences?\nAssistant: ",
+      "expected": "I predict the next character from the current context, append it, and repeat. This is autoregressive generation. I stop at an end token or the generation limit.",
+      "generated": "I predict the next character from the current context, append it, and repeat. This is autoregressive generation. I stop at an end token or the generation limit."
+    },
+    {
+      "prompt": "User: Could you explain temperature in a few sentences?\nAssistant: ",
+      "expected": "Temperature divides logits before softmax. Lower values concentrate probability on likely tokens. Higher values spread probability more widely. Zero selects the most likely token.",
+      "generated": "Inference runs a trained model to produce predictions without updating its weights. Dropout is disabled and gradients are not needed."
+    },
+    {
+      "prompt": "User: Could you explain top-k in a few sentences?\nAssistant: ",
+      "expected": "Top-k sampling keeps only the k most likely tokens before sampling. A small k reduces variety. Setting k to zero disables this filter.",
+      "generated": "The feed-forward network applies a linear expansion, GELU activation, and linear projection independently to each token. Here its hidden width is four times the embedding width."
+    },
+    {
+      "prompt": "User: Could you explain top-p in a few sentences?\nAssistant: ",
+      "expected": "Top-p sampling retains the smallest ranked set whose cumulative probability reaches p. It adapts the number of candidates to the probability distribution.",
+      "generated": "Top-p sampling retains the smallest ranked set whose cumulative probability reaches p. It adapts the number of candidates to the probability distribution."
+    },
+    {
+      "prompt": "User: Could you explain causal mask in a few sentences?\nAssistant: ",
+      "expected": "The causal mask prevents a position from attending to later positions. Future scores are set to negative infinity before softmax, so their attention probability is zero.",
+      "generated": "The causal mask prevents a position from attending to later positions. Future scores are set to negative infinity before softmax, so their attention probability is zero."
+    },
+    {
+      "prompt": "User: Could you explain training from scratch in a few sentences?\nAssistant: ",
+      "expected": "Training from scratch learns all weights from random initialization. Fine-tuning adapts a pretrained model. Starting from scratch is useful for studying how learning works, but requires data and compute.",
+      "generated": "Training from scratch learns all weights from random initialization. Fine-tuning adapts a pretrained model. Starting from scratch is usefor studying how leareaing ata and compute."
+    },
+    {
+      "prompt": "User: Could you explain backpropagation in a few sentences?\nAssistant: ",
+      "expected": "Backpropagation applies the chain rule to compute gradients of the loss with respect to parameters. An optimizer uses those gradients to update the weights. It does not guarantee a global minimum.",
+      "generated": "A residual connection adds a module input to its output. This creates a direct path for information and gradients through successive transformer layers."
+    },
+    {
+      "prompt": "User: Could you explain context window in a few sentences?\nAssistant: ",
+      "expected": "The context window is the maximum number of input tokens the model can use at once. Here a token is a character. Older context is cropped when it exceeds the window.",
+      "generated": "The context window is the maximum number of input tokens the model can use at once. Here a token is a character. Older context is cropped when it exceeds the window."
+    },
+    {
+      "prompt": "User: Could you explain tokenization in a few sentences?\nAssistant: ",
+      "expected": "Tokenization converts text into integer IDs. This model uses character tokens, including spaces and punctuation. Unknown characters map to a special unknown token.",
+      "generated": "Tokenization converts text into integer IDs. This model uses character tokens, including spaces and punctuation. Unknown characters map to a special unknown token."
+    },
+    {
+      "prompt": "User: Could you explain embeddings in a few sentences?\nAssistant: ",
+      "expected": "An embedding table maps each discrete token ID to a learned vector. These vectors let the transformer process tokens with continuous arithmetic.",
+      "generated": "Cosine decay smoothly lowers the learning rate from a peak toward a minimum. Smaller late updates help refine the learned weights."
+    },
+    {
+      "prompt": "User: Could you explain position embeddings in a few sentences?\nAssistant: ",
+      "expected": "Position embeddings add information about a token position to its token vector. This model learns a separate vector for each position; it does not use sinusoidal position encodings.",
+      "generated": "Position embeddings add information about a token position to its token vector. This model learns a separate vector for each position; it does not use sinusoidal encodings."
+    },
+    {
+      "prompt": "User: Could you explain queries in a few sentences?\nAssistant: ",
+      "expected": "A query is a learned projection of the current token representation. Its dot products with keys determine which earlier positions receive attention.",
+      "generated": "Inference runs a trained model to produce predictions without updating its weights. Dropout is disabled and gradients are not needed."
+    },
+    {
+      "prompt": "User: Could you explain keys in a few sentences?\nAssistant: ",
+      "expected": "A key is a learned projection used for matching against queries. A high query-key score can give that position more weight after normalization.",
+      "generated": "A checkpoint saves model weights and configuration. A resumable training checkpoint also saves optimizer state, the step, and random generator states."
+    },
+    {
+      "prompt": "User: Could you explain values in a few sentences?\nAssistant: ",
+      "expected": "A value is a learned projection containing information to aggregate. Attention scores weight the values, and their weighted sum becomes the attention output.",
+      "generated": "Inference runs a trained model to produce predictions without updating its weights. Dropout is disabled and gradients are not needed."
+    },
+    {
+      "prompt": "User: Could you explain multiple heads in a few sentences?\nAssistant: ",
+      "expected": "Each head projects tokens into a different subspace and computes its own attention weights. The head outputs are concatenated and projected back to the model dimension.",
+      "generated": "Inference runs a trained model to produce predictions without updating is weights. Dropout is disabled and gradients are not needed."
+    },
+    {
+      "prompt": "User: Could you explain scaled dot products in a few sentences?\nAssistant: ",
+      "expected": "Attention divides query-key dot products by the square root of the head dimension. This helps keep score magnitudes and softmax gradients well behaved.",
+      "generated": "A residual connection adds a module input to its output. This creates a direct path for information and gradients through successive transformer layers."
+    },
+    {
+      "prompt": "User: Could you explain softmax in a few sentences?\nAssistant: ",
+      "expected": "Softmax turns logits into positive probabilities that sum to one. Subtracting the largest logit before exponentiation improves numerical stability without changing the probabilities.",
+      "generated": "Softmax turns logits into positive probabilities that sum to one. Subtracting the largest logit before exponentiation improves numerical stability without changing the probabilities."
+    },
+    {
+      "prompt": "User: Could you explain logits in a few sentences?\nAssistant: ",
+      "expected": "Logits are unnormalized scores for each possible next token. Softmax converts them into probabilities. They are scores, not probabilities themselves.",
+      "generated": "Weight decay discourages large parameter values. With AdamW it is applied separately from the gradient-based adaptive update."
+    },
+    {
+      "prompt": "User: Could you explain cross entropy in a few sentences?\nAssistant: ",
+      "expected": "Cross entropy is the negative log probability assigned to the correct next token. Lower loss means the model assigns more probability to observed targets.",
+      "generated": "Cross entropy is the negative log probability assigned to the correct next token. Lower loss means the model assigns more probability to observed targets."
+    },
+    {
+      "prompt": "User: Could you explain perplexity in a few sentences?\nAssistant: ",
+      "expected": "Perplexity is the exponential of average cross-entropy loss. Lower is better on the same dataset and tokenizer. Character and word perplexities are not directly comparable.",
+      "generated": "I predict the next character from the current context, append it, and repeat. This is autoregressive generation. I stop at an end token or the generation limit."
+    },
+    {
+      "prompt": "User: Could you explain validation in a few sentences?\nAssistant: ",
+      "expected": "Validation examples are excluded from gradient updates and used to select a checkpoint. A separate test set is used for the final evaluation.",
+      "generated": "I am a small educational model trained on a narrow synthetic curriculum. I can repeat learned explanations but may fail on unfamiliar questions. I cannot browse the web or verify facts."
+    },
+    {
+      "prompt": "User: Could you explain data leakage in a few sentences?\nAssistant: ",
+      "expected": "Data leakage occurs when evaluation information enters training. Duplicated documents across splits can make validation scores look much better than real generalization.",
+      "generated": "I was trained on a small original curriculum of machine learning questions and answers. Evaluation holds out question phrasings, while the underlying topics overlap witraining."
+    },
+    {
+      "prompt": "User: Could you explain overfitting in a few sentences?\nAssistant: ",
+      "expected": "Overfitting means learning training-specific patterns that do not transfer to new examples. A widening gap between training and validation loss can be a warning sign.",
+      "generated": "I am a trained model to a narrow synthetic curriculum. I can repeat learned explanations but may fail on unfamiliar questions. I cannot browse the web or verify facts."
+    },
+    {
+      "prompt": "User: Could you explain dropout in a few sentences?\nAssistant: ",
+      "expected": "Dropout randomly zeros activations during training as regularization. It is disabled during evaluation and generation so the model uses its full representation.",
+      "generated": "Inference runs a trained model to produce predictions without updating its weights. Dropout is disabled and gradients are not needed."
+    },
+    {
+      "prompt": "User: Could you explain layer normalization in a few sentences?\nAssistant: ",
+      "expected": "Layer normalization normalizes features within each token representation using their mean and variance. It helps stabilize optimization in deep networks.",
+      "generated": "Generalization is performance on examples outside the training set. Testing a paraphrase of a known topic is easier than answering an entirely unseen topic."
+    },
+    {
+      "prompt": "User: Could you explain residual connections in a few sentences?\nAssistant: ",
+      "expected": "A residual connection adds a module input to its output. This creates a direct path for information and gradients through successive transformer layers.",
+      "generated": "A residual connection adds a module input to its output. This creates a direct path for information and gradients through successive transformer layers."
+    },
+    {
+      "prompt": "User: Could you explain GELU in a few sentences?\nAssistant: ",
+      "expected": "GELU is a smooth nonlinear activation used in the feed-forward network. Nonlinearity allows the network to learn more than a single linear transformation.",
+      "generated": "GELU is a smooth nonlinear activation used in the feed-forward network. Nonlinearity allows the network to learn more than a single linear transformation."
+    },
+    {
+      "prompt": "User: Could you explain feed-forward network in a few sentences?\nAssistant: ",
+      "expected": "The feed-forward network applies a linear expansion, GELU activation, and linear projection independently to each token. Here its hidden width is four times the embedding width.",
+      "generated": "The feed-forward network applies a linear expansion, GELU activation, and linear projection independently to each token. Here its hidden width is four times the embedddding widid widdth."
+    },
+    {
+      "prompt": "User: Could you explain AdamW in a few sentences?\nAssistant: ",
+      "expected": "AdamW is an adaptive optimizer with decoupled weight decay. It tracks moving averages of gradients and squared gradients to scale parameter updates.",
+      "generated": "The context window is the maximum number of input tokens the model can use at once. Here a token is a character. Older context is cropped when it exceeds the window."
+    },
+    {
+      "prompt": "User: Could you explain learning rate in a few sentences?\nAssistant: ",
+      "expected": "The learning rate controls the size of optimizer updates. Too large can destabilize training; too small can slow learning. Warmup and decay help manage it over a run.",
+      "generated": "I use four causal transformer layers, four attention heads, 19256-chard cter context window. My weights are learned from random initialization."
+    },
+    {
+      "prompt": "User: Could you explain warmup in a few sentences?\nAssistant: ",
+      "expected": "Warmup gradually increases the learning rate near the start of training. This can reduce unstable updates while the model and optimizer statistics are still settling.",
+      "generated": "Warmup gradually increases the learning rate near the start of training. This can reduce unstable updates while the model and optimizer statistics are still settling."
+    },
+    {
+      "prompt": "User: Could you explain cosine decay in a few sentences?\nAssistant: ",
+      "expected": "Cosine decay smoothly lowers the learning rate from a peak toward a minimum. Smaller late updates help refine the learned weights.",
+      "generated": "Cosine decay smoothly lowers the learning rate from a peak toward a minimum. Smaller late updates help refine the learned weights."
+    },
+    {
+      "prompt": "User: Could you explain gradient clipping in a few sentences?\nAssistant: ",
+      "expected": "Gradient clipping limits the gradient norm before an optimizer update. It can prevent occasional large gradients from causing excessively large parameter changes.",
+      "generated": "Gradient clipping limits the gradient norm before an optimizer update. It can prevent occasional large gradients from causing excessively large parameter changes."
+    },
+    {
+      "prompt": "User: Could you explain weight decay in a few sentences?\nAssistant: ",
+      "expected": "Weight decay discourages large parameter values. With AdamW it is applied separately from the gradient-based adaptive update.",
+      "generated": "Weight decay discourages large parameter values. With AdamW it is applied separately from the gradient-based adaptive update."
+    },
+    {
+      "prompt": "User: Could you explain weight tying in a few sentences?\nAssistant: ",
+      "expected": "Weight tying shares the token embedding matrix with the output projection. It reduces parameter count and connects input token representations to output token scores.",
+      "generated": "Weight tying shares the token embedding matrix with the output projection. It reduces parameter count and connects input token representations to output token scores."
+    },
+    {
+      "prompt": "User: Could you explain batch size in a few sentences?\nAssistant: ",
+      "expected": "Batch size is the number of examples used for one gradient estimate. Larger batches use more memory and change the noise in the gradient estimate.",
+      "generated": "Cosine decay smoothly lowers the learning rate from a peak toward a minimum. Smaller late updates help refine the learned weights."
+    },
+    {
+      "prompt": "User: Could you explain checkpoint in a few sentences?\nAssistant: ",
+      "expected": "A checkpoint saves model weights and configuration. A resumable training checkpoint also saves optimizer state, the step, and random generator states.",
+      "generated": "A checkpoint saves model weights and configuration. A resumable training checkpoint also saves optimizer state, the step, and random generator states."
+    },
+    {
+      "prompt": "User: Could you explain random seed in a few sentences?\nAssistant: ",
+      "expected": "A seed makes random initialization and sampling repeatable within a controlled environment. Exact results can still differ across hardware or software versions.",
+      "generated": "Cosine decay smoothly lowers the learning rate from a peak toward a minimum. Smaller late updates help refine the learned weights."
+    },
+    {
+      "prompt": "User: Could you explain inference in a few sentences?\nAssistant: ",
+      "expected": "Inference runs a trained model to produce predictions without updating its weights. Dropout is disabled and gradients are not needed.",
+      "generated": "Inference runs a trained model to produce predictions without updating its weights. Dropout is disabled and gradients are not needed."
+    },
+    {
+      "prompt": "User: Could you explain ONNX in a few sentences?\nAssistant: ",
+      "expected": "ONNX is a portable representation of a model computation graph and weights. This project exports its trained transformer so the website can run CPU inference without PyTorch.",
+      "generated": "ONNX is a portable representation of a model computation graph and weights. This project exports its trained transformer so the website can run CPU inference without PyTorch."
+    },
+    {
+      "prompt": "User: Could you explain CPU and GPU in a few sentences?\nAssistant: ",
+      "expected": "CPUs handle diverse sequential work, while GPUs can execute many arithmetic operations in parallel. Model size, batching, and transfer overhead determine which is faster.",
+      "generated": "CPUs handle diverse sequential work, while GPUs can execute many arithmetic operations in parallel. Model size, batching, and transfer overhead determine which is faster."
+    },
+    {
+      "prompt": "User: Could you explain MPS in a few sentences?\nAssistant: ",
+      "expected": "MPS is the PyTorch backend for accelerated tensor operations on supported Apple GPUs. This project can also train on CUDA or CPU.",
+      "generated": "MPS is the PyTorch backend for accelerated tensor operations on supported Apple GPUs. This project can also train on CPUDA or CPU."
+    },
+    {
+      "prompt": "User: Could you explain hallucination in a few sentences?\nAssistant: ",
+      "expected": "A hallucination is generated content that is incorrect or unsupported. A language model predicts text; high token probability does not guarantee factual accuracy.",
+      "generated": "A hallucination is generated content that is incorrect or unsupported. A language model predicts text; high token probability does not guarantee factual accuracy."
+    },
+    {
+      "prompt": "User: Could you explain limitations in a few sentences?\nAssistant: ",
+      "expected": "I am a small educational model trained on a narrow synthetic curriculum. I can repeat learned explanations but may fail on unfamiliar questions. I cannot browse the web or verify facts.",
+      "generated": "I am a small educational model trained on a narrow synthetic curriculum. I can repeat learned explanations but may fail on unfamiliar questions. I cannot browse the web or verify facts."
+    },
+    {
+      "prompt": "User: Could you explain reasoning in a few sentences?\nAssistant: ",
+      "expected": "No. My training is limited to short educational examples. Fluent output is not proof of reasoning or correctness. Use the model to explore transformers, not for important decisions.",
+      "generated": "I predict the next character from the current context, append it, and repeat. This autoregressive generation. I stop at an end token or the generation limit."
+    },
+    {
+      "prompt": "User: Could you explain privacy in a few sentences?\nAssistant: ",
+      "expected": "A generation request supplies a temporary context. The model weights do not change during a conversation. Hosting infrastructure may still keep request logs.",
+      "generated": "Cosine decay smoothly lowers the learning rate from a peak toward a minimum. Smaller late updates help refine the learned weights."
+    },
+    {
+      "prompt": "User: Could you explain end token in a few sentences?\nAssistant: ",
+      "expected": "An end token marks the end of a training example or response. During generation it lets the model stop before reaching the maximum token budget.",
+      "generated": "An end token marks the end of a training example or response. During generation it lets the model stop before reaching the maximum token budget."
+    },
+    {
+      "prompt": "User: Could you explain greedy decoding in a few sentences?\nAssistant: ",
+      "expected": "Greedy decoding always selects the token with the highest score. It is deterministic for fixed weights and context, but does not guarantee the best whole sequence.",
+      "generated": "Cosine decay smoothly lowers the learning rate from a peak toward a minimum. Smaller late updates help refine the learned weights."
+    },
+    {
+      "prompt": "User: Could you explain attention interpretation in a few sentences?\nAssistant: ",
+      "expected": "No. Attention weights show how one module mixes positions. Residual streams and feed-forward layers also affect predictions, so a heatmap is not a complete causal explanation.",
+      "generated": "Attention computes similarities between queries and keys, then uses normalize, to the step, and random generator states."
+    },
+    {
+      "prompt": "User: Could you explain training data in a few sentences?\nAssistant: ",
+      "expected": "I was trained on a small original curriculum of machine learning questions and answers. Evaluation holds out question phrasings, while the underlying topics overlap with training.",
+      "generated": "I was trained on a small original curriculum of machine learning questions and answers. Evaluation holds out question phrasings, while the underlying topics overlap with traing."
+    },
+    {
+      "prompt": "User: Could you explain silicon transmutation in a few sentences?\nAssistant: ",
+      "expected": "Silicon transmutation is a fictional metaphor from this project: turning electrical signals into structured computation. It is not a scientific claim about consciousness.",
+      "generated": "Silicon transmutation is a fictional metaphor from this project: turning electrical signals into structured computation. It is not a scientific claim about conscousssnes."
+    },
+    {
+      "prompt": "User: Could you explain fine-tuning in a few sentences?\nAssistant: ",
+      "expected": "Fine-tuning continues training an existing pretrained model on new examples. It can adapt behavior efficiently, but still requires careful data selection and evaluation.",
+      "generated": "Fine-tuning continues training an existing pretrained model on new examples. It can adapt behavior efficiently, but still requires careful data selection and evaluation."
+    },
+    {
+      "prompt": "User: Could you explain generalization in a few sentences?\nAssistant: ",
+      "expected": "Generalization is performance on examples outside the training set. Testing a paraphrase of a known topic is easier than answering an entirely unseen topic.",
+      "generated": "Generalization is performance on examples outside the training set. Testing a paraphrase of a known topic is easier than answering an entirely unseen topic."
+    },
+    {
+      "prompt": "User: Could you explain training mode in a few sentences?\nAssistant: ",
+      "expected": "Training mode enables operations such as dropout. Evaluation mode disables them. Forgetting to restore training mode after generating a sample can silently change a training run.",
+      "generated": "Cosine decay smoothly lowers the learning rate from a peak toward a minimum. Smaller late updates help refine the learned weights."
+    },
+    {
+      "prompt": "User: Could you explain parameter count in a few sentences?\nAssistant: ",
+      "expected": "No. More parameters increase capacity and compute cost, but data quality and evaluation matter too. A larger model can overfit a small dataset.",
+      "generated": "I use four causal transformer layers, four attention heads, 19256-chard cter context window. My weights are learned from random initialization."
+    }
+  ],
+  "scope": "Held-out question phrasings of seen facts. Teacher-forced answer loss does not measure free-generation factual accuracy."
+}

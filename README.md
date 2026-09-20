@@ -1,145 +1,149 @@
-# TinyTransformer LM: Generative Decoder Transformer From Scratch
+# TinyTransformer Lab
 
-An autoregressive Causal Decoder Transformer built and pre-trained completely from scratch (zero external transformer dependencies) in pure PyTorch on a custom niche corpus ("The Cybernetic Alchemist's Research Log & Machine Philosophy Codex").
+An inspectable language model trained from random weights, with a React playground,
+real attention heatmaps, next-token probabilities, and measured training telemetry.
+Runs locally with PyTorch or on Netlify with the same weights exported to ONNX.
 
-Includes real-time autoregressive text generation, interactive loss curves, multi-head attention weight heatmaps, next-token candidate probability distributions, and a complete dark-mode cyber aesthetic web dashboard.
+## What's improved in v2
 
----
+- **1,838,016 parameters**, up from 813,184; **256-character context**, up from 128.
+- 58 original teaching topics with 1,392 training, 116 validation, and 58 test documents.
+- Document-level splits, masked prompt/padding loss, a fixed vocabulary, a seeded
+  training sampler, validation-selected checkpoints, and an explicit final test.
+- Accelerated PyTorch causal attention plus an explicit, inspectable ONNX path.
+- End-of-response tokens, seeded sampling, stop controls, useful errors, and
+  automatic formatting for plain-text questions.
+- Charts and source views generated from actual training artifacts. No fabricated
+  attention matrix or canned answer when inference fails.
+- Model, export, API, and frontend checks run in GitHub Actions.
 
-## 🚀 Quick Start
+## Results and limitations
 
-### 1. Launch Both Backend & Frontend
+| Same held-out question phrasings | Previous checkpoint | v2 checkpoint |
+| --- | ---: | ---: |
+| Answer-token cross entropy | 4.410 | 0.019 |
+| Character perplexity | 82.27 | 1.019 |
+| Parameters | 813,184 | 1,838,016 |
+| Context length | 128 | 256 |
+
+Greedy free generation exactly matches the target on **57/58 canonical training
+questions**, but only **26/58 held-out question formats**. This gap matters:
+the model is useful for studying learned explanations, but still has weak format
+generalization. Both full output sets are committed in `docs/`.
+
+These are **teacher-forced answer-token metrics on new phrasings of known topics**.
+Answers and topics overlap with training by design. This tests narrow paraphrase
+robustness, not unseen-topic knowledge or general reasoning. Context length and
+vocabulary also changed; this is a whole-system comparison, not an isolated
+parameter-count experiment. The original corpus repeated text across its split,
+so its old validation score is not comparable to the new validation score.
+
+The model remains a small educational demonstration. It can memorize or mix up
+answers, hallucinate, and fail on unfamiliar questions. Token probability is not
+factual confidence. See [model card](docs/MODEL_CARD.md),
+[recorded generations](docs/evaluation.json), and
+[training report](backend/checkpoints/training_history.json).
+
+## Run locally
+
+Requires Python 3.9–3.12 and **Node 22.12+** (the `.nvmrc` selects Node 22).
+
 ```bash
-cd /Users/yashanand/Desktop/Projects/TinyTransformer
+nvm install
+nvm use
+python3 -m venv backend/.venv
+backend/.venv/bin/python -m pip install -r backend/requirements.txt
+npm ci
+npm --prefix frontend ci
 ./run.sh
 ```
-- **Web Dashboard**: [http://127.0.0.1:5173](http://127.0.0.1:5173)
-- **FastAPI Backend**: [http://127.0.0.1:8008](http://127.0.0.1:8008)
-- **Interactive Swagger Docs**: [http://127.0.0.1:8008/docs](http://127.0.0.1:8008/docs)
 
----
+- Dashboard: http://127.0.0.1:5173
+- API and interactive docs: http://127.0.0.1:8008/docs
 
-## 🧠 Architecture Overview
+The launcher checks port availability and stops only processes it starts.
+Try `What is attention?`, `Explain overfitting.`, or `What are your limitations?`.
+For reproducible sampling, use the same prompt, settings, seed, and engine.
+PyTorch and the JavaScript runtime use different random number generators;
+identical seeds are not promised to generate identical sampled text across engines.
 
-Built from primitive PyTorch modules (`nn.Linear`, `nn.Embedding`, `nn.LayerNorm`, `nn.GELU`) without high-level abstractions:
+## Train and evaluate
 
-| Component | Specification |
-| :--- | :--- |
-| **Model Type** | Causal Decoder-Only Transformer (GPT Architecture) |
-| **Parameters** | **813,824** |
-| **Embedding Dimension ($d_{model}$)** | 128 |
-| **Transformer Blocks ($N_{layer}$)** | 4 Layers |
-| **Attention Heads ($N_{head}$)** | 4 Heads (32 dimensions per head) |
-| **Feed-Forward Expansion** | 4x ($128 \to 512 \to 128$) with GELU |
-| **Context Window ($T_{block}$)** | 128 Tokens |
-| **Vocabulary Size** | 86 Characters & Special Tokens (`<PAD>`, `<UNK>`, `<BOS>`, `<EOS>`) |
-| **Weight Tying** | Token Embedding Matrix tied to Output Projection Head |
-| **Hardware Compute** | Apple Silicon Metal Performance Shaders (`mps`) |
-
----
-
-## 📈 Training Telemetry & Loss Curves
-
-Trained from pure random Gaussian noise ($\mu=0, \sigma=0.02$) with AdamW optimizer and cosine learning rate decay:
-
-- **Total Steps**: 1,600 steps
-- **Batch Size**: 32 sequences &bull; 128 tokens per sequence = 4,096 tokens/step
-- **Total Tokens Trained**: **6,553,600 tokens**
-- **Training Duration**: **40.93 seconds** (on Apple Silicon MPS)
-- **Initial Loss**: 2.96 (step 50)
-- **Final Validation Loss**: **0.2768** (&darr; 90.6% error reduction)
-- **Final Perplexity**: **1.32** (down from 18.81)
-
-### Training Progression (Evolution of Output)
-1. **Step 0 (Pure Entropy)**: `=== LOG ENTRY?????0#00pgg!o0eNPywrr0!WP3..NPpk]](E?S...`
-2. **Step 400 (Proto-Syntax)**: `=== LOG ENTRY = Thugrat by ithtion tonsthe alie of llemoby r...`
-3. **Step 1000 (Grammar & Structure)**: `=== LOG ENTRY 1204: THE COponigh the trkeson is begen orad, ...`
-4. **Step 1600 (Fluent Domain Knowledge)**: `=== LOG ENTRY 012: THE ANINTHE MINTANIFON == In recurent arc...`
-
----
-
-## 💻 Web Dashboard Features
-
-1. **Interactive Generation Playground**:
-   - Seed prompt input with quick presets.
-   - Real-time sliders: Temperature ($0.10 - 1.50$), Top-K ($1 - 50$), Top-P Nucleus ($0.20 - 1.00$), Max Tokens ($20 - 200$).
-   - Streaming typewriter generation with celebration confetti.
-   - Next-token candidate probability bar chart for any generated token.
-   - Colorized token chips inspector.
-2. **Loss Curves & Training Telemetry**:
-   - High-fidelity interactive SVG charts comparing Training Loss vs. Validation Loss over 1,600 steps.
-   - Perplexity reduction trajectory and cosine learning rate curve.
-3. **Multi-Head Attention Heatmap Visualizer**:
-   - Live interactive Query &times; Key dot-product attention scores across all 4 layers and 4 heads.
-   - Mathematical explanation of lower-triangular causal masking ($A_{ij} = 0 \text{ for } j > i$).
-4. **Transformer Internals**:
-   - Interactive dataflow diagram from embedding to attention to residual MLP to logits.
-   - Architectural deep-dive: *Why Scratch Pre-Training != Fine-Tuning*.
-5. **Niche Corpus & Tokenizer Explorer**:
-   - Searchable view of the training corpus and character frequency map.
-6. **Codebase Inspector**:
-   - In-app syntax-highlighted source code viewer for `model.py` and `train.py`.
-
----
-
-## 📂 Project Structure
-
-```
-p5/
-├── backend/
-│   ├── checkpoints/
-│   │   ├── best_model.pt             # Best checkpoint state dict
-│   │   ├── final_model.pt            # Final trained model
-│   │   └── training_history.json     # Complete loss curve telemetry
-│   ├── data/
-│   │   ├── corpus.txt                # Niche training text (31k chars)
-│   │   └── tokenizer.json            # Vocabulary and token mappings (86 tokens)
-│   ├── model.py                      # Pure PyTorch Causal Transformer from scratch
-│   ├── corpus.py                     # Niche corpus definition
-│   ├── tokenizer.py                  # Character-level tokenizer
-│   ├── train.py                      # Training loop, cosine LR, validation evaluation
-│   ├── server.py                     # FastAPI server (/generate, /attention, /metrics)
-│   └── .venv/                        # Python virtual environment
-├── frontend/
-│   ├── src/
-│   │   ├── App.tsx                   # Interactive dashboard component
-│   │   ├── index.css                 # Custom Obsidian Cyber design system
-│   │   ├── data/                     # Embedded training telemetry & codebase
-│   │   └── main.tsx
-│   ├── dist/                         # Production build
-│   └── package.json
-├── run.sh                            # Unified start script
-└── README.md
+```bash
+# Stage 1: learn the initial curriculum from random weights.
+backend/.venv/bin/python backend/train.py --steps 2000 --seed 2026 --device cpu --curriculum bootstrap --prefix-weight 1 --output backend/runs/v2
+# Stage 2: improve question conditioning and format coverage.
+backend/.venv/bin/python backend/train.py --steps 5000 --seed 2026 --init backend/runs/v2/best_model.pt --output backend/runs/v3
 ```
 
-## Netlify deployment
+The default architecture has four layers, four heads, width 192, a 256-token
+context, GELU, pre-normalization, tied embeddings, and dropout 0.1. Training uses
+AdamW, warmup/cosine decay, gradient clipping, and answer-only loss. Refinement weights the first 32
+supervised tokens eight times more strongly to improve answer selection. Checkpoints
+are selected using validation loss. CPU, CUDA, and Apple MPS are supported.
+Reproduction can vary across hardware and PyTorch versions. The initial stage took about six minutes on CPU, followed by about 198 seconds
+on Apple MPS for refinement; see the report for the exact configuration and duration.
 
-Production: https://tinytransformer-yashanand.netlify.app
+Promote a run only after reviewing its validation results:
 
-Use Node.js 22.12 or newer. From the repository root:
+```bash
+cp backend/runs/v3/best_model.pt backend/checkpoints/best_model.pt
+cp backend/runs/v3/final_model.pt backend/checkpoints/final_model.pt
+cp backend/runs/v3/tokenizer.json backend/data/tokenizer.json
+cp backend/runs/v3/training_history.json backend/checkpoints/training_history.json
+backend/.venv/bin/python -m pip install -r backend/requirements-dev.txt
+backend/.venv/bin/python scripts/export_model.py
+backend/.venv/bin/python scripts/sync_artifacts.py
+backend/.venv/bin/python scripts/evaluate.py
+backend/.venv/bin/python scripts/evaluate.py --split canonical --output docs/canonical_evaluation.json
+backend/.venv/bin/python scripts/sync_artifacts.py
+```
+
+`final_model.pt` is an alias of the validation-selected model, not necessarily the
+last optimization step. Run directories are ignored by Git. The curriculum and
+split hashes are versioned in `backend/data/dataset_manifest.json`.
+
+## Verify
+
+```bash
+backend/.venv/bin/python -m unittest discover -s backend -p 'test_*.py'
+npm test
+npm run build
+```
+
+Tests cover causal masking, fast/explicit attention equivalence, prompt masking,
+split disjointness, evaluation mode restoration, exported model parity, seeded
+sampling, and API validation. The export parity fixture is regenerated from the
+PyTorch checkpoint by `scripts/export_model.py`.
+
+## Netlify
+
+Site: https://tinytransformer-yashanand.netlify.app
 
 ```bash
 npm ci
 npm run build
-npm test
 npx --package netlify-cli netlify deploy --prod --no-build
 ```
 
-Netlify serves `frontend/dist` and routes `/api/*` to the TypeScript inference
-function. The function runs the original trained weights through ONNX Runtime
-on CPU; it does not require the local FastAPI server. Local Vite development
-continues to use `http://127.0.0.1:8008`. Set `VITE_API_BASE_URL` at build time
-only when using a different backend.
+Netlify publishes `frontend/dist` and routes `/api/*` to a CPU inference function.
+The ONNX weights and tokenizer are packaged with that function; no local backend
+is needed. Local Vite development uses port 8008. `VITE_API_BASE_URL` optionally
+selects another API at build time. There are no required third-party model keys.
+The existing site may require Netlify team login. GitHub CI validates commits;
+production deployment remains a separate, manual step.
 
-The portable model is checked into `netlify/model/model.onnx`. After retraining,
-install `onnx` into the backend Python environment and regenerate it with:
+## Project map
 
-```bash
-backend/.venv/bin/python scripts/export_model.py
-npm test
-```
+- `backend/model.py`: transformer and sampling
+- `backend/curriculum.py`: original educational dataset
+- `backend/train.py`: training and evaluation
+- `backend/server.py`: local FastAPI endpoints
+- `netlify/functions/`: portable inference and HTTP validation
+- `frontend/src/`: interactive lab
+- `scripts/`: ONNX export, evaluation, artifact synchronization, tests
 
-The export script also regenerates the PyTorch reference outputs used to check
-logit and attention parity. Publish only `frontend/dist`; model and corpus assets
-are bundled privately with the function. This is a manual deployment; automatic
-GitHub deploys have not been configured.
+The project uses PyTorch's documented
+[scaled dot-product attention](https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html)
+for the training path. The explicit attention path remains available for teaching,
+inspection, and export.

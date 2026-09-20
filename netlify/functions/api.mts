@@ -40,7 +40,7 @@ export default async (req: Request) => {
     }
     const { settings, vocab } = await getSystem();
     if (route === 'health') return json({status:'online',device:'cpu',model_loaded:true,tokenizer_loaded:true,params:settings.parameters});
-    if (route === 'info') return json({...settings, model_name:'TinyTransformer-Alchemist',architecture:'Causal Decoder-Only Transformer (GPT Architecture)',device:'cpu',head_dim:settings.d_model/settings.n_head});
+    if (route === 'info') return json({...settings, model_name:'TinyTransformer-Lab-v2',architecture:'Causal Decoder-Only Transformer (GPT Architecture)',device:'cpu',head_dim:settings.d_model/settings.n_head});
     const tokens = await tokenize(Array.from(string('text','=== LOG ENTRY: The silicon lattice')).slice(0,32).join(''));
     const ids = tokens.length ? tokens.map(t=>t.id) : [2];
     const { attention } = await forward(ids);

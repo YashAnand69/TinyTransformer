@@ -18,7 +18,7 @@ test('generation supports full context, sampling and reproducible seeds', async 
   const a = await generate(input), b = await generate(input);
   assert.equal(a.generated_text,b.generated_text);
   assert.equal(a.step_details.length,4);
-  const full = await generate({...input,prompt:'a'.repeat(140),max_new_tokens:2,temperature:0});
+  const full = await generate({...input,prompt:'a'.repeat(300),max_new_tokens:2,temperature:0});
   assert.equal(full.tokens_generated,2);
 });
 test('API validates input and returns real causal attention including empty input', async () => {
@@ -32,4 +32,23 @@ test('API validates input and returns real causal attention including empty inpu
       assert.ok(row.slice(i+1).every((v:number)=>v===0));
     }
   }
+});
+test('export supports boundary lengths and matches PyTorch greedy decoding', async () => {
+  const reference = JSON.parse(await readFile('scripts/reference.json','utf8'));
+  for (const item of reference.boundary_cases) {
+    const actual = await forward(item.ids);
+    const differences = Array.from(actual.logits.data as Float32Array, (v,i)=>Math.abs(v-item.logits[i]));
+    assert.ok(Math.max(...differences)<0.0001);
+  }
+  const result = await generate({...reference.greedy,temperature:0,top_k:0,top_p:1});
+  assert.equal(result.generated_text,reference.greedy.text);
+});
+test('dashboard and portable model describe the same checkpoint', async () => {
+  const report = JSON.parse(await readFile('frontend/src/data/training_history.json','utf8'));
+  const config = JSON.parse(await readFile('netlify/model/config.json','utf8'));
+  const tokenizer = JSON.parse(await readFile('backend/data/tokenizer.json','utf8'));
+  assert.equal(report.summary.parameters,config.parameters);
+  assert.equal(report.summary.block_size,config.block_size);
+  assert.equal(tokenizer.vocab.length,config.vocab_size);
+  assert.deepEqual(report,JSON.parse(await readFile('backend/checkpoints/training_history.json','utf8')));
 });

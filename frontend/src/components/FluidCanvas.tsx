@@ -186,7 +186,7 @@ export default function FluidCanvas({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     // Retina 2x scale for razor-sharp rendering
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -287,7 +287,7 @@ export default function FluidCanvas({
     let isMouseDown = false;
 
     const handleResize = () => {
-      if (!canvas) return;
+      if (!canvas || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       width = canvas.width = Math.floor(window.innerWidth * dpr);
       height = canvas.height = Math.floor(window.innerHeight * dpr);
       gl.viewport(0, 0, width, height);

@@ -1,408 +1,408 @@
 [
   {
     "topic": "identity",
-    "question": "Can you explain identity briefly?",
+    "question": "Could you explain identity in a few sentences?",
     "answer": "I am TinyTransformer, a small language model trained from scratch. I explain machine learning concepts. I can make mistakes and I am not a general-purpose assistant.",
-    "text": "User: Can you explain identity briefly?\nAssistant: I am TinyTransformer, a small language model trained from scratch. I explain machine learning concepts. I can make mistakes and I am not a general-purpose assistant.",
-    "id": "f3b1e88bc2358e37"
+    "text": "User: Could you explain identity in a few sentences?\nAssistant: I am TinyTransformer, a small language model trained from scratch. I explain machine learning concepts. I can make mistakes and I am not a general-purpose assistant.",
+    "id": "9530553ebf556a08"
   },
   {
     "topic": "architecture",
-    "question": "Can you explain architecture briefly?",
+    "question": "Could you explain architecture in a few sentences?",
     "answer": "I use four causal transformer layers, four attention heads, 192 embedding dimensions, and a 256-character context window. My weights are learned from random initialization.",
-    "text": "User: Can you explain architecture briefly?\nAssistant: I use four causal transformer layers, four attention heads, 192 embedding dimensions, and a 256-character context window. My weights are learned from random initialization.",
-    "id": "9bae95d0794b7963"
+    "text": "User: Could you explain architecture in a few sentences?\nAssistant: I use four causal transformer layers, four attention heads, 192 embedding dimensions, and a 256-character context window. My weights are learned from random initialization.",
+    "id": "a6b909fc9189f64b"
   },
   {
     "topic": "attention",
-    "question": "Can you explain attention briefly?",
+    "question": "Could you explain attention in a few sentences?",
     "answer": "Attention computes similarities between queries and keys, then uses normalized scores to combine value vectors. The result lets each token use relevant earlier context.",
-    "text": "User: Can you explain attention briefly?\nAssistant: Attention computes similarities between queries and keys, then uses normalized scores to combine value vectors. The result lets each token use relevant earlier context.",
-    "id": "418948caf0ff9284"
+    "text": "User: Could you explain attention in a few sentences?\nAssistant: Attention computes similarities between queries and keys, then uses normalized scores to combine value vectors. The result lets each token use relevant earlier context.",
+    "id": "b4b2135029194d7d"
   },
   {
     "topic": "generation",
-    "question": "Can you explain generation briefly?",
+    "question": "Could you explain generation in a few sentences?",
     "answer": "I predict the next character from the current context, append it, and repeat. This is autoregressive generation. I stop at an end token or the generation limit.",
-    "text": "User: Can you explain generation briefly?\nAssistant: I predict the next character from the current context, append it, and repeat. This is autoregressive generation. I stop at an end token or the generation limit.",
-    "id": "3062a14085cd9b82"
+    "text": "User: Could you explain generation in a few sentences?\nAssistant: I predict the next character from the current context, append it, and repeat. This is autoregressive generation. I stop at an end token or the generation limit.",
+    "id": "adde747d52bcb7a3"
   },
   {
     "topic": "temperature",
-    "question": "Can you explain temperature briefly?",
+    "question": "Could you explain temperature in a few sentences?",
     "answer": "Temperature divides logits before softmax. Lower values concentrate probability on likely tokens. Higher values spread probability more widely. Zero selects the most likely token.",
-    "text": "User: Can you explain temperature briefly?\nAssistant: Temperature divides logits before softmax. Lower values concentrate probability on likely tokens. Higher values spread probability more widely. Zero selects the most likely token.",
-    "id": "7ab39b0c8495dc95"
+    "text": "User: Could you explain temperature in a few sentences?\nAssistant: Temperature divides logits before softmax. Lower values concentrate probability on likely tokens. Higher values spread probability more widely. Zero selects the most likely token.",
+    "id": "00224a3d389ac589"
   },
   {
     "topic": "top-k",
-    "question": "Can you explain top-k briefly?",
+    "question": "Could you explain top-k in a few sentences?",
     "answer": "Top-k sampling keeps only the k most likely tokens before sampling. A small k reduces variety. Setting k to zero disables this filter.",
-    "text": "User: Can you explain top-k briefly?\nAssistant: Top-k sampling keeps only the k most likely tokens before sampling. A small k reduces variety. Setting k to zero disables this filter.",
-    "id": "5a341f6bb5a24de9"
+    "text": "User: Could you explain top-k in a few sentences?\nAssistant: Top-k sampling keeps only the k most likely tokens before sampling. A small k reduces variety. Setting k to zero disables this filter.",
+    "id": "e4e9db60d540fa94"
   },
   {
     "topic": "top-p",
-    "question": "Can you explain top-p briefly?",
+    "question": "Could you explain top-p in a few sentences?",
     "answer": "Top-p sampling retains the smallest ranked set whose cumulative probability reaches p. It adapts the number of candidates to the probability distribution.",
-    "text": "User: Can you explain top-p briefly?\nAssistant: Top-p sampling retains the smallest ranked set whose cumulative probability reaches p. It adapts the number of candidates to the probability distribution.",
-    "id": "b08c083c688a63a1"
+    "text": "User: Could you explain top-p in a few sentences?\nAssistant: Top-p sampling retains the smallest ranked set whose cumulative probability reaches p. It adapts the number of candidates to the probability distribution.",
+    "id": "61abe20c703b9b77"
   },
   {
     "topic": "causal mask",
-    "question": "Can you explain causal mask briefly?",
+    "question": "Could you explain causal mask in a few sentences?",
     "answer": "The causal mask prevents a position from attending to later positions. Future scores are set to negative infinity before softmax, so their attention probability is zero.",
-    "text": "User: Can you explain causal mask briefly?\nAssistant: The causal mask prevents a position from attending to later positions. Future scores are set to negative infinity before softmax, so their attention probability is zero.",
-    "id": "0efbf7993b58b9e8"
+    "text": "User: Could you explain causal mask in a few sentences?\nAssistant: The causal mask prevents a position from attending to later positions. Future scores are set to negative infinity before softmax, so their attention probability is zero.",
+    "id": "2844a185727bd714"
   },
   {
     "topic": "training from scratch",
-    "question": "Can you explain training from scratch briefly?",
+    "question": "Could you explain training from scratch in a few sentences?",
     "answer": "Training from scratch learns all weights from random initialization. Fine-tuning adapts a pretrained model. Starting from scratch is useful for studying how learning works, but requires data and compute.",
-    "text": "User: Can you explain training from scratch briefly?\nAssistant: Training from scratch learns all weights from random initialization. Fine-tuning adapts a pretrained model. Starting from scratch is useful for studying how learning works, but requires data and compute.",
-    "id": "5a569620d0488038"
+    "text": "User: Could you explain training from scratch in a few sentences?\nAssistant: Training from scratch learns all weights from random initialization. Fine-tuning adapts a pretrained model. Starting from scratch is useful for studying how learning works, but requires data and compute.",
+    "id": "7cb18e9c5fbd6bd0"
   },
   {
     "topic": "backpropagation",
-    "question": "Can you explain backpropagation briefly?",
+    "question": "Could you explain backpropagation in a few sentences?",
     "answer": "Backpropagation applies the chain rule to compute gradients of the loss with respect to parameters. An optimizer uses those gradients to update the weights. It does not guarantee a global minimum.",
-    "text": "User: Can you explain backpropagation briefly?\nAssistant: Backpropagation applies the chain rule to compute gradients of the loss with respect to parameters. An optimizer uses those gradients to update the weights. It does not guarantee a global minimum.",
-    "id": "ef917b06344a32a8"
+    "text": "User: Could you explain backpropagation in a few sentences?\nAssistant: Backpropagation applies the chain rule to compute gradients of the loss with respect to parameters. An optimizer uses those gradients to update the weights. It does not guarantee a global minimum.",
+    "id": "828de0e54475af05"
   },
   {
     "topic": "context window",
-    "question": "Can you explain context window briefly?",
+    "question": "Could you explain context window in a few sentences?",
     "answer": "The context window is the maximum number of input tokens the model can use at once. Here a token is a character. Older context is cropped when it exceeds the window.",
-    "text": "User: Can you explain context window briefly?\nAssistant: The context window is the maximum number of input tokens the model can use at once. Here a token is a character. Older context is cropped when it exceeds the window.",
-    "id": "f25156d76b107662"
+    "text": "User: Could you explain context window in a few sentences?\nAssistant: The context window is the maximum number of input tokens the model can use at once. Here a token is a character. Older context is cropped when it exceeds the window.",
+    "id": "559bccfba4522e4a"
   },
   {
     "topic": "tokenization",
-    "question": "Can you explain tokenization briefly?",
+    "question": "Could you explain tokenization in a few sentences?",
     "answer": "Tokenization converts text into integer IDs. This model uses character tokens, including spaces and punctuation. Unknown characters map to a special unknown token.",
-    "text": "User: Can you explain tokenization briefly?\nAssistant: Tokenization converts text into integer IDs. This model uses character tokens, including spaces and punctuation. Unknown characters map to a special unknown token.",
-    "id": "3eb7520e34ba54e1"
+    "text": "User: Could you explain tokenization in a few sentences?\nAssistant: Tokenization converts text into integer IDs. This model uses character tokens, including spaces and punctuation. Unknown characters map to a special unknown token.",
+    "id": "3728e63ab838cb50"
   },
   {
     "topic": "embeddings",
-    "question": "Can you explain embeddings briefly?",
+    "question": "Could you explain embeddings in a few sentences?",
     "answer": "An embedding table maps each discrete token ID to a learned vector. These vectors let the transformer process tokens with continuous arithmetic.",
-    "text": "User: Can you explain embeddings briefly?\nAssistant: An embedding table maps each discrete token ID to a learned vector. These vectors let the transformer process tokens with continuous arithmetic.",
-    "id": "21d4d54309a3380e"
+    "text": "User: Could you explain embeddings in a few sentences?\nAssistant: An embedding table maps each discrete token ID to a learned vector. These vectors let the transformer process tokens with continuous arithmetic.",
+    "id": "cee3ef874f99afba"
   },
   {
     "topic": "position embeddings",
-    "question": "Can you explain position embeddings briefly?",
+    "question": "Could you explain position embeddings in a few sentences?",
     "answer": "Position embeddings add information about a token position to its token vector. This model learns a separate vector for each position; it does not use sinusoidal position encodings.",
-    "text": "User: Can you explain position embeddings briefly?\nAssistant: Position embeddings add information about a token position to its token vector. This model learns a separate vector for each position; it does not use sinusoidal position encodings.",
-    "id": "0a10fb5d4348a966"
+    "text": "User: Could you explain position embeddings in a few sentences?\nAssistant: Position embeddings add information about a token position to its token vector. This model learns a separate vector for each position; it does not use sinusoidal position encodings.",
+    "id": "c7a5703aad8550da"
   },
   {
     "topic": "queries",
-    "question": "Can you explain queries briefly?",
+    "question": "Could you explain queries in a few sentences?",
     "answer": "A query is a learned projection of the current token representation. Its dot products with keys determine which earlier positions receive attention.",
-    "text": "User: Can you explain queries briefly?\nAssistant: A query is a learned projection of the current token representation. Its dot products with keys determine which earlier positions receive attention.",
-    "id": "eb1cbe9c600a7248"
+    "text": "User: Could you explain queries in a few sentences?\nAssistant: A query is a learned projection of the current token representation. Its dot products with keys determine which earlier positions receive attention.",
+    "id": "2ecdd58730375b79"
   },
   {
     "topic": "keys",
-    "question": "Can you explain keys briefly?",
+    "question": "Could you explain keys in a few sentences?",
     "answer": "A key is a learned projection used for matching against queries. A high query-key score can give that position more weight after normalization.",
-    "text": "User: Can you explain keys briefly?\nAssistant: A key is a learned projection used for matching against queries. A high query-key score can give that position more weight after normalization.",
-    "id": "3b286420a23239fb"
+    "text": "User: Could you explain keys in a few sentences?\nAssistant: A key is a learned projection used for matching against queries. A high query-key score can give that position more weight after normalization.",
+    "id": "898720fbc24f3b81"
   },
   {
     "topic": "values",
-    "question": "Can you explain values briefly?",
+    "question": "Could you explain values in a few sentences?",
     "answer": "A value is a learned projection containing information to aggregate. Attention scores weight the values, and their weighted sum becomes the attention output.",
-    "text": "User: Can you explain values briefly?\nAssistant: A value is a learned projection containing information to aggregate. Attention scores weight the values, and their weighted sum becomes the attention output.",
-    "id": "fd5b16bebeaaed5d"
+    "text": "User: Could you explain values in a few sentences?\nAssistant: A value is a learned projection containing information to aggregate. Attention scores weight the values, and their weighted sum becomes the attention output.",
+    "id": "0ddff3a13f541f2e"
   },
   {
     "topic": "multiple heads",
-    "question": "Can you explain multiple heads briefly?",
+    "question": "Could you explain multiple heads in a few sentences?",
     "answer": "Each head projects tokens into a different subspace and computes its own attention weights. The head outputs are concatenated and projected back to the model dimension.",
-    "text": "User: Can you explain multiple heads briefly?\nAssistant: Each head projects tokens into a different subspace and computes its own attention weights. The head outputs are concatenated and projected back to the model dimension.",
-    "id": "abe63a8d64608f86"
+    "text": "User: Could you explain multiple heads in a few sentences?\nAssistant: Each head projects tokens into a different subspace and computes its own attention weights. The head outputs are concatenated and projected back to the model dimension.",
+    "id": "eccfb718cbe86bab"
   },
   {
     "topic": "scaled dot products",
-    "question": "Can you explain scaled dot products briefly?",
+    "question": "Could you explain scaled dot products in a few sentences?",
     "answer": "Attention divides query-key dot products by the square root of the head dimension. This helps keep score magnitudes and softmax gradients well behaved.",
-    "text": "User: Can you explain scaled dot products briefly?\nAssistant: Attention divides query-key dot products by the square root of the head dimension. This helps keep score magnitudes and softmax gradients well behaved.",
-    "id": "a98bf21c5ccadc8c"
+    "text": "User: Could you explain scaled dot products in a few sentences?\nAssistant: Attention divides query-key dot products by the square root of the head dimension. This helps keep score magnitudes and softmax gradients well behaved.",
+    "id": "347e583303047e0f"
   },
   {
     "topic": "softmax",
-    "question": "Can you explain softmax briefly?",
+    "question": "Could you explain softmax in a few sentences?",
     "answer": "Softmax turns logits into positive probabilities that sum to one. Subtracting the largest logit before exponentiation improves numerical stability without changing the probabilities.",
-    "text": "User: Can you explain softmax briefly?\nAssistant: Softmax turns logits into positive probabilities that sum to one. Subtracting the largest logit before exponentiation improves numerical stability without changing the probabilities.",
-    "id": "5e65f55bc954a320"
+    "text": "User: Could you explain softmax in a few sentences?\nAssistant: Softmax turns logits into positive probabilities that sum to one. Subtracting the largest logit before exponentiation improves numerical stability without changing the probabilities.",
+    "id": "3d143ada278bef89"
   },
   {
     "topic": "logits",
-    "question": "Can you explain logits briefly?",
+    "question": "Could you explain logits in a few sentences?",
     "answer": "Logits are unnormalized scores for each possible next token. Softmax converts them into probabilities. They are scores, not probabilities themselves.",
-    "text": "User: Can you explain logits briefly?\nAssistant: Logits are unnormalized scores for each possible next token. Softmax converts them into probabilities. They are scores, not probabilities themselves.",
-    "id": "7776adbf9466bedb"
+    "text": "User: Could you explain logits in a few sentences?\nAssistant: Logits are unnormalized scores for each possible next token. Softmax converts them into probabilities. They are scores, not probabilities themselves.",
+    "id": "3479c63f4ce21724"
   },
   {
     "topic": "cross entropy",
-    "question": "Can you explain cross entropy briefly?",
+    "question": "Could you explain cross entropy in a few sentences?",
     "answer": "Cross entropy is the negative log probability assigned to the correct next token. Lower loss means the model assigns more probability to observed targets.",
-    "text": "User: Can you explain cross entropy briefly?\nAssistant: Cross entropy is the negative log probability assigned to the correct next token. Lower loss means the model assigns more probability to observed targets.",
-    "id": "93edb8b16fe60dfd"
+    "text": "User: Could you explain cross entropy in a few sentences?\nAssistant: Cross entropy is the negative log probability assigned to the correct next token. Lower loss means the model assigns more probability to observed targets.",
+    "id": "37e6844d13f5eede"
   },
   {
     "topic": "perplexity",
-    "question": "Can you explain perplexity briefly?",
+    "question": "Could you explain perplexity in a few sentences?",
     "answer": "Perplexity is the exponential of average cross-entropy loss. Lower is better on the same dataset and tokenizer. Character and word perplexities are not directly comparable.",
-    "text": "User: Can you explain perplexity briefly?\nAssistant: Perplexity is the exponential of average cross-entropy loss. Lower is better on the same dataset and tokenizer. Character and word perplexities are not directly comparable.",
-    "id": "5f694d819f898904"
+    "text": "User: Could you explain perplexity in a few sentences?\nAssistant: Perplexity is the exponential of average cross-entropy loss. Lower is better on the same dataset and tokenizer. Character and word perplexities are not directly comparable.",
+    "id": "3d2d30906ebf87d6"
   },
   {
     "topic": "validation",
-    "question": "Can you explain validation briefly?",
+    "question": "Could you explain validation in a few sentences?",
     "answer": "Validation examples are excluded from gradient updates and used to select a checkpoint. A separate test set is used for the final evaluation.",
-    "text": "User: Can you explain validation briefly?\nAssistant: Validation examples are excluded from gradient updates and used to select a checkpoint. A separate test set is used for the final evaluation.",
-    "id": "859c5408b5fd73b0"
+    "text": "User: Could you explain validation in a few sentences?\nAssistant: Validation examples are excluded from gradient updates and used to select a checkpoint. A separate test set is used for the final evaluation.",
+    "id": "d9e92c07eb5288e6"
   },
   {
     "topic": "data leakage",
-    "question": "Can you explain data leakage briefly?",
+    "question": "Could you explain data leakage in a few sentences?",
     "answer": "Data leakage occurs when evaluation information enters training. Duplicated documents across splits can make validation scores look much better than real generalization.",
-    "text": "User: Can you explain data leakage briefly?\nAssistant: Data leakage occurs when evaluation information enters training. Duplicated documents across splits can make validation scores look much better than real generalization.",
-    "id": "bd6991de9760dbb2"
+    "text": "User: Could you explain data leakage in a few sentences?\nAssistant: Data leakage occurs when evaluation information enters training. Duplicated documents across splits can make validation scores look much better than real generalization.",
+    "id": "d1bc0996fd569306"
   },
   {
     "topic": "overfitting",
-    "question": "Can you explain overfitting briefly?",
+    "question": "Could you explain overfitting in a few sentences?",
     "answer": "Overfitting means learning training-specific patterns that do not transfer to new examples. A widening gap between training and validation loss can be a warning sign.",
-    "text": "User: Can you explain overfitting briefly?\nAssistant: Overfitting means learning training-specific patterns that do not transfer to new examples. A widening gap between training and validation loss can be a warning sign.",
-    "id": "17f9342a38622d68"
+    "text": "User: Could you explain overfitting in a few sentences?\nAssistant: Overfitting means learning training-specific patterns that do not transfer to new examples. A widening gap between training and validation loss can be a warning sign.",
+    "id": "28e073aaadc3c983"
   },
   {
     "topic": "dropout",
-    "question": "Can you explain dropout briefly?",
+    "question": "Could you explain dropout in a few sentences?",
     "answer": "Dropout randomly zeros activations during training as regularization. It is disabled during evaluation and generation so the model uses its full representation.",
-    "text": "User: Can you explain dropout briefly?\nAssistant: Dropout randomly zeros activations during training as regularization. It is disabled during evaluation and generation so the model uses its full representation.",
-    "id": "c4c59d44b0d1785e"
+    "text": "User: Could you explain dropout in a few sentences?\nAssistant: Dropout randomly zeros activations during training as regularization. It is disabled during evaluation and generation so the model uses its full representation.",
+    "id": "11303679e8426113"
   },
   {
     "topic": "layer normalization",
-    "question": "Can you explain layer normalization briefly?",
+    "question": "Could you explain layer normalization in a few sentences?",
     "answer": "Layer normalization normalizes features within each token representation using their mean and variance. It helps stabilize optimization in deep networks.",
-    "text": "User: Can you explain layer normalization briefly?\nAssistant: Layer normalization normalizes features within each token representation using their mean and variance. It helps stabilize optimization in deep networks.",
-    "id": "fda0f1139ab2eb9d"
+    "text": "User: Could you explain layer normalization in a few sentences?\nAssistant: Layer normalization normalizes features within each token representation using their mean and variance. It helps stabilize optimization in deep networks.",
+    "id": "e2f639c863b71c0e"
   },
   {
     "topic": "residual connections",
-    "question": "Can you explain residual connections briefly?",
+    "question": "Could you explain residual connections in a few sentences?",
     "answer": "A residual connection adds a module input to its output. This creates a direct path for information and gradients through successive transformer layers.",
-    "text": "User: Can you explain residual connections briefly?\nAssistant: A residual connection adds a module input to its output. This creates a direct path for information and gradients through successive transformer layers.",
-    "id": "8eafecf08a509799"
+    "text": "User: Could you explain residual connections in a few sentences?\nAssistant: A residual connection adds a module input to its output. This creates a direct path for information and gradients through successive transformer layers.",
+    "id": "63cf6a6f0259765c"
   },
   {
     "topic": "GELU",
-    "question": "Can you explain GELU briefly?",
+    "question": "Could you explain GELU in a few sentences?",
     "answer": "GELU is a smooth nonlinear activation used in the feed-forward network. Nonlinearity allows the network to learn more than a single linear transformation.",
-    "text": "User: Can you explain GELU briefly?\nAssistant: GELU is a smooth nonlinear activation used in the feed-forward network. Nonlinearity allows the network to learn more than a single linear transformation.",
-    "id": "85a5d599b376d283"
+    "text": "User: Could you explain GELU in a few sentences?\nAssistant: GELU is a smooth nonlinear activation used in the feed-forward network. Nonlinearity allows the network to learn more than a single linear transformation.",
+    "id": "596f8fcacb791bde"
   },
   {
     "topic": "feed-forward network",
-    "question": "Can you explain feed-forward network briefly?",
+    "question": "Could you explain feed-forward network in a few sentences?",
     "answer": "The feed-forward network applies a linear expansion, GELU activation, and linear projection independently to each token. Here its hidden width is four times the embedding width.",
-    "text": "User: Can you explain feed-forward network briefly?\nAssistant: The feed-forward network applies a linear expansion, GELU activation, and linear projection independently to each token. Here its hidden width is four times the embedding width.",
-    "id": "828fd6a9599d23c9"
+    "text": "User: Could you explain feed-forward network in a few sentences?\nAssistant: The feed-forward network applies a linear expansion, GELU activation, and linear projection independently to each token. Here its hidden width is four times the embedding width.",
+    "id": "52732c4eba02f79c"
   },
   {
     "topic": "AdamW",
-    "question": "Can you explain AdamW briefly?",
+    "question": "Could you explain AdamW in a few sentences?",
     "answer": "AdamW is an adaptive optimizer with decoupled weight decay. It tracks moving averages of gradients and squared gradients to scale parameter updates.",
-    "text": "User: Can you explain AdamW briefly?\nAssistant: AdamW is an adaptive optimizer with decoupled weight decay. It tracks moving averages of gradients and squared gradients to scale parameter updates.",
-    "id": "ef40172fccd85510"
+    "text": "User: Could you explain AdamW in a few sentences?\nAssistant: AdamW is an adaptive optimizer with decoupled weight decay. It tracks moving averages of gradients and squared gradients to scale parameter updates.",
+    "id": "269d2d01572f0850"
   },
   {
     "topic": "learning rate",
-    "question": "Can you explain learning rate briefly?",
+    "question": "Could you explain learning rate in a few sentences?",
     "answer": "The learning rate controls the size of optimizer updates. Too large can destabilize training; too small can slow learning. Warmup and decay help manage it over a run.",
-    "text": "User: Can you explain learning rate briefly?\nAssistant: The learning rate controls the size of optimizer updates. Too large can destabilize training; too small can slow learning. Warmup and decay help manage it over a run.",
-    "id": "bf1411af0edcc991"
+    "text": "User: Could you explain learning rate in a few sentences?\nAssistant: The learning rate controls the size of optimizer updates. Too large can destabilize training; too small can slow learning. Warmup and decay help manage it over a run.",
+    "id": "14aacaefb64ce967"
   },
   {
     "topic": "warmup",
-    "question": "Can you explain warmup briefly?",
+    "question": "Could you explain warmup in a few sentences?",
     "answer": "Warmup gradually increases the learning rate near the start of training. This can reduce unstable updates while the model and optimizer statistics are still settling.",
-    "text": "User: Can you explain warmup briefly?\nAssistant: Warmup gradually increases the learning rate near the start of training. This can reduce unstable updates while the model and optimizer statistics are still settling.",
-    "id": "e529fdf5daaccc02"
+    "text": "User: Could you explain warmup in a few sentences?\nAssistant: Warmup gradually increases the learning rate near the start of training. This can reduce unstable updates while the model and optimizer statistics are still settling.",
+    "id": "7ed67922ed1f222c"
   },
   {
     "topic": "cosine decay",
-    "question": "Can you explain cosine decay briefly?",
+    "question": "Could you explain cosine decay in a few sentences?",
     "answer": "Cosine decay smoothly lowers the learning rate from a peak toward a minimum. Smaller late updates help refine the learned weights.",
-    "text": "User: Can you explain cosine decay briefly?\nAssistant: Cosine decay smoothly lowers the learning rate from a peak toward a minimum. Smaller late updates help refine the learned weights.",
-    "id": "5d4786d977ed4485"
+    "text": "User: Could you explain cosine decay in a few sentences?\nAssistant: Cosine decay smoothly lowers the learning rate from a peak toward a minimum. Smaller late updates help refine the learned weights.",
+    "id": "4baffbe0d26b69e0"
   },
   {
     "topic": "gradient clipping",
-    "question": "Can you explain gradient clipping briefly?",
+    "question": "Could you explain gradient clipping in a few sentences?",
     "answer": "Gradient clipping limits the gradient norm before an optimizer update. It can prevent occasional large gradients from causing excessively large parameter changes.",
-    "text": "User: Can you explain gradient clipping briefly?\nAssistant: Gradient clipping limits the gradient norm before an optimizer update. It can prevent occasional large gradients from causing excessively large parameter changes.",
-    "id": "03b555d4c5a1617f"
+    "text": "User: Could you explain gradient clipping in a few sentences?\nAssistant: Gradient clipping limits the gradient norm before an optimizer update. It can prevent occasional large gradients from causing excessively large parameter changes.",
+    "id": "f7c9293b990bacf2"
   },
   {
     "topic": "weight decay",
-    "question": "Can you explain weight decay briefly?",
+    "question": "Could you explain weight decay in a few sentences?",
     "answer": "Weight decay discourages large parameter values. With AdamW it is applied separately from the gradient-based adaptive update.",
-    "text": "User: Can you explain weight decay briefly?\nAssistant: Weight decay discourages large parameter values. With AdamW it is applied separately from the gradient-based adaptive update.",
-    "id": "b691a40a288e5551"
+    "text": "User: Could you explain weight decay in a few sentences?\nAssistant: Weight decay discourages large parameter values. With AdamW it is applied separately from the gradient-based adaptive update.",
+    "id": "5e0c73e0a70294fd"
   },
   {
     "topic": "weight tying",
-    "question": "Can you explain weight tying briefly?",
+    "question": "Could you explain weight tying in a few sentences?",
     "answer": "Weight tying shares the token embedding matrix with the output projection. It reduces parameter count and connects input token representations to output token scores.",
-    "text": "User: Can you explain weight tying briefly?\nAssistant: Weight tying shares the token embedding matrix with the output projection. It reduces parameter count and connects input token representations to output token scores.",
-    "id": "6ea001f2efd3016e"
+    "text": "User: Could you explain weight tying in a few sentences?\nAssistant: Weight tying shares the token embedding matrix with the output projection. It reduces parameter count and connects input token representations to output token scores.",
+    "id": "a808c3ac565440e9"
   },
   {
     "topic": "batch size",
-    "question": "Can you explain batch size briefly?",
+    "question": "Could you explain batch size in a few sentences?",
     "answer": "Batch size is the number of examples used for one gradient estimate. Larger batches use more memory and change the noise in the gradient estimate.",
-    "text": "User: Can you explain batch size briefly?\nAssistant: Batch size is the number of examples used for one gradient estimate. Larger batches use more memory and change the noise in the gradient estimate.",
-    "id": "d49cbb422dca9b46"
+    "text": "User: Could you explain batch size in a few sentences?\nAssistant: Batch size is the number of examples used for one gradient estimate. Larger batches use more memory and change the noise in the gradient estimate.",
+    "id": "fcce3e2628032c81"
   },
   {
     "topic": "checkpoint",
-    "question": "Can you explain checkpoint briefly?",
+    "question": "Could you explain checkpoint in a few sentences?",
     "answer": "A checkpoint saves model weights and configuration. A resumable training checkpoint also saves optimizer state, the step, and random generator states.",
-    "text": "User: Can you explain checkpoint briefly?\nAssistant: A checkpoint saves model weights and configuration. A resumable training checkpoint also saves optimizer state, the step, and random generator states.",
-    "id": "80c6582a794ac161"
+    "text": "User: Could you explain checkpoint in a few sentences?\nAssistant: A checkpoint saves model weights and configuration. A resumable training checkpoint also saves optimizer state, the step, and random generator states.",
+    "id": "5501fcb16fa32488"
   },
   {
     "topic": "random seed",
-    "question": "Can you explain random seed briefly?",
+    "question": "Could you explain random seed in a few sentences?",
     "answer": "A seed makes random initialization and sampling repeatable within a controlled environment. Exact results can still differ across hardware or software versions.",
-    "text": "User: Can you explain random seed briefly?\nAssistant: A seed makes random initialization and sampling repeatable within a controlled environment. Exact results can still differ across hardware or software versions.",
-    "id": "140ce8e0e12fbd51"
+    "text": "User: Could you explain random seed in a few sentences?\nAssistant: A seed makes random initialization and sampling repeatable within a controlled environment. Exact results can still differ across hardware or software versions.",
+    "id": "78f882eccff363bc"
   },
   {
     "topic": "inference",
-    "question": "Can you explain inference briefly?",
+    "question": "Could you explain inference in a few sentences?",
     "answer": "Inference runs a trained model to produce predictions without updating its weights. Dropout is disabled and gradients are not needed.",
-    "text": "User: Can you explain inference briefly?\nAssistant: Inference runs a trained model to produce predictions without updating its weights. Dropout is disabled and gradients are not needed.",
-    "id": "b165b90eb6053a24"
+    "text": "User: Could you explain inference in a few sentences?\nAssistant: Inference runs a trained model to produce predictions without updating its weights. Dropout is disabled and gradients are not needed.",
+    "id": "d44f20ba1ce2fbfa"
   },
   {
     "topic": "ONNX",
-    "question": "Can you explain ONNX briefly?",
+    "question": "Could you explain ONNX in a few sentences?",
     "answer": "ONNX is a portable representation of a model computation graph and weights. This project exports its trained transformer so the website can run CPU inference without PyTorch.",
-    "text": "User: Can you explain ONNX briefly?\nAssistant: ONNX is a portable representation of a model computation graph and weights. This project exports its trained transformer so the website can run CPU inference without PyTorch.",
-    "id": "617594bc50d47f75"
+    "text": "User: Could you explain ONNX in a few sentences?\nAssistant: ONNX is a portable representation of a model computation graph and weights. This project exports its trained transformer so the website can run CPU inference without PyTorch.",
+    "id": "8ca777e6fe47e90a"
   },
   {
     "topic": "CPU and GPU",
-    "question": "Can you explain CPU and GPU briefly?",
+    "question": "Could you explain CPU and GPU in a few sentences?",
     "answer": "CPUs handle diverse sequential work, while GPUs can execute many arithmetic operations in parallel. Model size, batching, and transfer overhead determine which is faster.",
-    "text": "User: Can you explain CPU and GPU briefly?\nAssistant: CPUs handle diverse sequential work, while GPUs can execute many arithmetic operations in parallel. Model size, batching, and transfer overhead determine which is faster.",
-    "id": "467766a733040cc8"
+    "text": "User: Could you explain CPU and GPU in a few sentences?\nAssistant: CPUs handle diverse sequential work, while GPUs can execute many arithmetic operations in parallel. Model size, batching, and transfer overhead determine which is faster.",
+    "id": "b682658bb2dcba4c"
   },
   {
     "topic": "MPS",
-    "question": "Can you explain MPS briefly?",
+    "question": "Could you explain MPS in a few sentences?",
     "answer": "MPS is the PyTorch backend for accelerated tensor operations on supported Apple GPUs. This project can also train on CUDA or CPU.",
-    "text": "User: Can you explain MPS briefly?\nAssistant: MPS is the PyTorch backend for accelerated tensor operations on supported Apple GPUs. This project can also train on CUDA or CPU.",
-    "id": "e088edfcce2e0a10"
+    "text": "User: Could you explain MPS in a few sentences?\nAssistant: MPS is the PyTorch backend for accelerated tensor operations on supported Apple GPUs. This project can also train on CUDA or CPU.",
+    "id": "587862394692ccea"
   },
   {
     "topic": "hallucination",
-    "question": "Can you explain hallucination briefly?",
+    "question": "Could you explain hallucination in a few sentences?",
     "answer": "A hallucination is generated content that is incorrect or unsupported. A language model predicts text; high token probability does not guarantee factual accuracy.",
-    "text": "User: Can you explain hallucination briefly?\nAssistant: A hallucination is generated content that is incorrect or unsupported. A language model predicts text; high token probability does not guarantee factual accuracy.",
-    "id": "d0e9c3243266131c"
+    "text": "User: Could you explain hallucination in a few sentences?\nAssistant: A hallucination is generated content that is incorrect or unsupported. A language model predicts text; high token probability does not guarantee factual accuracy.",
+    "id": "4c88e1027e336beb"
   },
   {
     "topic": "limitations",
-    "question": "Can you explain limitations briefly?",
+    "question": "Could you explain limitations in a few sentences?",
     "answer": "I am a small educational model trained on a narrow synthetic curriculum. I can repeat learned explanations but may fail on unfamiliar questions. I cannot browse the web or verify facts.",
-    "text": "User: Can you explain limitations briefly?\nAssistant: I am a small educational model trained on a narrow synthetic curriculum. I can repeat learned explanations but may fail on unfamiliar questions. I cannot browse the web or verify facts.",
-    "id": "4bc257740164009d"
+    "text": "User: Could you explain limitations in a few sentences?\nAssistant: I am a small educational model trained on a narrow synthetic curriculum. I can repeat learned explanations but may fail on unfamiliar questions. I cannot browse the web or verify facts.",
+    "id": "7ebbf3f1895c44cd"
   },
   {
     "topic": "reasoning",
-    "question": "Can you explain reasoning briefly?",
+    "question": "Could you explain reasoning in a few sentences?",
     "answer": "No. My training is limited to short educational examples. Fluent output is not proof of reasoning or correctness. Use the model to explore transformers, not for important decisions.",
-    "text": "User: Can you explain reasoning briefly?\nAssistant: No. My training is limited to short educational examples. Fluent output is not proof of reasoning or correctness. Use the model to explore transformers, not for important decisions.",
-    "id": "a86473a5dbc508a9"
+    "text": "User: Could you explain reasoning in a few sentences?\nAssistant: No. My training is limited to short educational examples. Fluent output is not proof of reasoning or correctness. Use the model to explore transformers, not for important decisions.",
+    "id": "190d2aa702a6f773"
   },
   {
     "topic": "privacy",
-    "question": "Can you explain privacy briefly?",
+    "question": "Could you explain privacy in a few sentences?",
     "answer": "A generation request supplies a temporary context. The model weights do not change during a conversation. Hosting infrastructure may still keep request logs.",
-    "text": "User: Can you explain privacy briefly?\nAssistant: A generation request supplies a temporary context. The model weights do not change during a conversation. Hosting infrastructure may still keep request logs.",
-    "id": "96d4d2195d922fc0"
+    "text": "User: Could you explain privacy in a few sentences?\nAssistant: A generation request supplies a temporary context. The model weights do not change during a conversation. Hosting infrastructure may still keep request logs.",
+    "id": "da5fb991d49ec2ef"
   },
   {
     "topic": "end token",
-    "question": "Can you explain end token briefly?",
+    "question": "Could you explain end token in a few sentences?",
     "answer": "An end token marks the end of a training example or response. During generation it lets the model stop before reaching the maximum token budget.",
-    "text": "User: Can you explain end token briefly?\nAssistant: An end token marks the end of a training example or response. During generation it lets the model stop before reaching the maximum token budget.",
-    "id": "a9a3c74e6ee85800"
+    "text": "User: Could you explain end token in a few sentences?\nAssistant: An end token marks the end of a training example or response. During generation it lets the model stop before reaching the maximum token budget.",
+    "id": "9326d751f02666cb"
   },
   {
     "topic": "greedy decoding",
-    "question": "Can you explain greedy decoding briefly?",
+    "question": "Could you explain greedy decoding in a few sentences?",
     "answer": "Greedy decoding always selects the token with the highest score. It is deterministic for fixed weights and context, but does not guarantee the best whole sequence.",
-    "text": "User: Can you explain greedy decoding briefly?\nAssistant: Greedy decoding always selects the token with the highest score. It is deterministic for fixed weights and context, but does not guarantee the best whole sequence.",
-    "id": "b387b6c5e712aa21"
+    "text": "User: Could you explain greedy decoding in a few sentences?\nAssistant: Greedy decoding always selects the token with the highest score. It is deterministic for fixed weights and context, but does not guarantee the best whole sequence.",
+    "id": "8d24623e5d5d78f7"
   },
   {
     "topic": "attention interpretation",
-    "question": "Can you explain attention interpretation briefly?",
+    "question": "Could you explain attention interpretation in a few sentences?",
     "answer": "No. Attention weights show how one module mixes positions. Residual streams and feed-forward layers also affect predictions, so a heatmap is not a complete causal explanation.",
-    "text": "User: Can you explain attention interpretation briefly?\nAssistant: No. Attention weights show how one module mixes positions. Residual streams and feed-forward layers also affect predictions, so a heatmap is not a complete causal explanation.",
-    "id": "406d94eb3037d387"
+    "text": "User: Could you explain attention interpretation in a few sentences?\nAssistant: No. Attention weights show how one module mixes positions. Residual streams and feed-forward layers also affect predictions, so a heatmap is not a complete causal explanation.",
+    "id": "cd69a2d399a56231"
   },
   {
     "topic": "training data",
-    "question": "Can you explain training data briefly?",
+    "question": "Could you explain training data in a few sentences?",
     "answer": "I was trained on a small original curriculum of machine learning questions and answers. Evaluation holds out question phrasings, while the underlying topics overlap with training.",
-    "text": "User: Can you explain training data briefly?\nAssistant: I was trained on a small original curriculum of machine learning questions and answers. Evaluation holds out question phrasings, while the underlying topics overlap with training.",
-    "id": "7c16e5eed3b14e24"
+    "text": "User: Could you explain training data in a few sentences?\nAssistant: I was trained on a small original curriculum of machine learning questions and answers. Evaluation holds out question phrasings, while the underlying topics overlap with training.",
+    "id": "07438dde912c250d"
   },
   {
     "topic": "silicon transmutation",
-    "question": "Can you explain silicon transmutation briefly?",
+    "question": "Could you explain silicon transmutation in a few sentences?",
     "answer": "Silicon transmutation is a fictional metaphor from this project: turning electrical signals into structured computation. It is not a scientific claim about consciousness.",
-    "text": "User: Can you explain silicon transmutation briefly?\nAssistant: Silicon transmutation is a fictional metaphor from this project: turning electrical signals into structured computation. It is not a scientific claim about consciousness.",
-    "id": "63279a866246c34b"
+    "text": "User: Could you explain silicon transmutation in a few sentences?\nAssistant: Silicon transmutation is a fictional metaphor from this project: turning electrical signals into structured computation. It is not a scientific claim about consciousness.",
+    "id": "7db556c652745370"
   },
   {
     "topic": "fine-tuning",
-    "question": "Can you explain fine-tuning briefly?",
+    "question": "Could you explain fine-tuning in a few sentences?",
     "answer": "Fine-tuning continues training an existing pretrained model on new examples. It can adapt behavior efficiently, but still requires careful data selection and evaluation.",
-    "text": "User: Can you explain fine-tuning briefly?\nAssistant: Fine-tuning continues training an existing pretrained model on new examples. It can adapt behavior efficiently, but still requires careful data selection and evaluation.",
-    "id": "c9eb53ef97bb5964"
+    "text": "User: Could you explain fine-tuning in a few sentences?\nAssistant: Fine-tuning continues training an existing pretrained model on new examples. It can adapt behavior efficiently, but still requires careful data selection and evaluation.",
+    "id": "aa135c9a0bb07d9e"
   },
   {
     "topic": "generalization",
-    "question": "Can you explain generalization briefly?",
+    "question": "Could you explain generalization in a few sentences?",
     "answer": "Generalization is performance on examples outside the training set. Testing a paraphrase of a known topic is easier than answering an entirely unseen topic.",
-    "text": "User: Can you explain generalization briefly?\nAssistant: Generalization is performance on examples outside the training set. Testing a paraphrase of a known topic is easier than answering an entirely unseen topic.",
-    "id": "f2afc75dd200903a"
+    "text": "User: Could you explain generalization in a few sentences?\nAssistant: Generalization is performance on examples outside the training set. Testing a paraphrase of a known topic is easier than answering an entirely unseen topic.",
+    "id": "911b37d26d210a0e"
   },
   {
     "topic": "training mode",
-    "question": "Can you explain training mode briefly?",
+    "question": "Could you explain training mode in a few sentences?",
     "answer": "Training mode enables operations such as dropout. Evaluation mode disables them. Forgetting to restore training mode after generating a sample can silently change a training run.",
-    "text": "User: Can you explain training mode briefly?\nAssistant: Training mode enables operations such as dropout. Evaluation mode disables them. Forgetting to restore training mode after generating a sample can silently change a training run.",
-    "id": "580a143ae0aab4c1"
+    "text": "User: Could you explain training mode in a few sentences?\nAssistant: Training mode enables operations such as dropout. Evaluation mode disables them. Forgetting to restore training mode after generating a sample can silently change a training run.",
+    "id": "c479dadd9b3f6ecd"
   },
   {
     "topic": "parameter count",
-    "question": "Can you explain parameter count briefly?",
+    "question": "Could you explain parameter count in a few sentences?",
     "answer": "No. More parameters increase capacity and compute cost, but data quality and evaluation matter too. A larger model can overfit a small dataset.",
-    "text": "User: Can you explain parameter count briefly?\nAssistant: No. More parameters increase capacity and compute cost, but data quality and evaluation matter too. A larger model can overfit a small dataset.",
-    "id": "255ea3e5d49b55d8"
+    "text": "User: Could you explain parameter count in a few sentences?\nAssistant: No. More parameters increase capacity and compute cost, but data quality and evaluation matter too. A larger model can overfit a small dataset.",
+    "id": "9f752c923a2dfa91"
   }
 ]

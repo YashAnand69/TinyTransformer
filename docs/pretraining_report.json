@@ -1,0 +1,236 @@
+{
+  "summary": {
+    "model_name": "TinyTransformer-Lab-v2",
+    "parameters": 1838016,
+    "vocab_size": 101,
+    "block_size": 256,
+    "layers": 4,
+    "heads": 4,
+    "d_model": 192,
+    "total_steps": 2000,
+    "best_step": 2000,
+    "batch_size": 24,
+    "tokens_per_step": 6144,
+    "total_tokens_trained": 12288000,
+    "supervised_tokens": 3916060,
+    "training_duration_sec": 362.94,
+    "device": "cpu",
+    "seed": 2026,
+    "best_val_loss": 0.30814,
+    "final_train_loss": 0.02133,
+    "final_val_loss": 0.30814,
+    "final_perplexity": 1.361,
+    "test_loss": 0.247931343024846,
+    "test_perplexity": 1.2813719540514867
+  },
+  "history": [
+    {
+      "step": 0,
+      "train_loss": 4.68173,
+      "val_loss": 4.68929,
+      "perplexity": 108.776,
+      "lr": 8e-06,
+      "elapsed_sec": 0.3
+    },
+    {
+      "step": 100,
+      "train_loss": 2.43471,
+      "val_loss": 2.48102,
+      "perplexity": 11.953,
+      "lr": 0.0008,
+      "elapsed_sec": 18.62
+    },
+    {
+      "step": 200,
+      "train_loss": 2.26704,
+      "val_loss": 2.34304,
+      "perplexity": 10.413,
+      "lr": 0.0007950900692249801,
+      "elapsed_sec": 36.28
+    },
+    {
+      "step": 300,
+      "train_loss": 2.07162,
+      "val_loss": 2.21365,
+      "perplexity": 9.149,
+      "lr": 0.0007804942070122285,
+      "elapsed_sec": 54.4
+    },
+    {
+      "step": 400,
+      "train_loss": 1.75764,
+      "val_loss": 2.05039,
+      "perplexity": 7.771,
+      "lr": 0.000756610550434336,
+      "elapsed_sec": 72.19
+    },
+    {
+      "step": 500,
+      "train_loss": 1.47662,
+      "val_loss": 1.84303,
+      "perplexity": 6.316,
+      "lr": 0.0007240905833827018,
+      "elapsed_sec": 90.18
+    },
+    {
+      "step": 600,
+      "train_loss": 1.19579,
+      "val_loss": 1.64838,
+      "perplexity": 5.199,
+      "lr": 0.0006838213657852669,
+      "elapsed_sec": 108.35
+    },
+    {
+      "step": 700,
+      "train_loss": 0.89132,
+      "val_loss": 1.36907,
+      "perplexity": 3.932,
+      "lr": 0.0006369013369240738,
+      "elapsed_sec": 126.36
+    },
+    {
+      "step": 800,
+      "train_loss": 0.68273,
+      "val_loss": 1.15555,
+      "perplexity": 3.176,
+      "lr": 0.0005846103528750691,
+      "elapsed_sec": 144.35
+    },
+    {
+      "step": 900,
+      "train_loss": 0.47897,
+      "val_loss": 1.00721,
+      "perplexity": 2.738,
+      "lr": 0.0005283747753706878,
+      "elapsed_sec": 162.41
+    },
+    {
+      "step": 1000,
+      "train_loss": 0.31925,
+      "val_loss": 0.82169,
+      "perplexity": 2.274,
+      "lr": 0.00046972856437003973,
+      "elapsed_sec": 180.83
+    },
+    {
+      "step": 1100,
+      "train_loss": 0.22728,
+      "val_loss": 0.76941,
+      "perplexity": 2.158,
+      "lr": 0.0004102714356299604,
+      "elapsed_sec": 199.84
+    },
+    {
+      "step": 1200,
+      "train_loss": 0.16474,
+      "val_loss": 0.60947,
+      "perplexity": 1.839,
+      "lr": 0.0003516252246293123,
+      "elapsed_sec": 218.55
+    },
+    {
+      "step": 1300,
+      "train_loss": 0.12443,
+      "val_loss": 0.51736,
+      "perplexity": 1.678,
+      "lr": 0.0002953896471249311,
+      "elapsed_sec": 237.07
+    },
+    {
+      "step": 1400,
+      "train_loss": 0.09008,
+      "val_loss": 0.45813,
+      "perplexity": 1.581,
+      "lr": 0.00024309866307592638,
+      "elapsed_sec": 255.52
+    },
+    {
+      "step": 1500,
+      "train_loss": 0.06382,
+      "val_loss": 0.40826,
+      "perplexity": 1.504,
+      "lr": 0.00019617863421473325,
+      "elapsed_sec": 273.87
+    },
+    {
+      "step": 1600,
+      "train_loss": 0.04532,
+      "val_loss": 0.40227,
+      "perplexity": 1.495,
+      "lr": 0.00015590941661729836,
+      "elapsed_sec": 292.28
+    },
+    {
+      "step": 1700,
+      "train_loss": 0.03432,
+      "val_loss": 0.34841,
+      "perplexity": 1.417,
+      "lr": 0.00012338944956566397,
+      "elapsed_sec": 310.29
+    },
+    {
+      "step": 1800,
+      "train_loss": 0.02896,
+      "val_loss": 0.35364,
+      "perplexity": 1.424,
+      "lr": 9.950579298777153e-05,
+      "elapsed_sec": 327.74
+    },
+    {
+      "step": 1900,
+      "train_loss": 0.02546,
+      "val_loss": 0.33366,
+      "perplexity": 1.396,
+      "lr": 8.490993077501998e-05,
+      "elapsed_sec": 345.17
+    },
+    {
+      "step": 2000,
+      "train_loss": 0.02133,
+      "val_loss": 0.30814,
+      "perplexity": 1.361,
+      "lr": 8e-05,
+      "elapsed_sec": 362.56
+    }
+  ],
+  "sample_generations": [
+    {
+      "step": 0,
+      "sample": "User: What is attention?\nAssistant:                                                                                                                         ",
+      "note": "Measured greedy generation from this training step"
+    },
+    {
+      "step": 500,
+      "sample": "User: What is attention?\nAssistant: Andus pon imalining aining aininis trating tinin ton mon tratin ton ton mon th con cumon eleston on tin ton can unan tin",
+      "note": "Measured greedy generation from this training step"
+    },
+    {
+      "step": 1000,
+      "sample": "User: What is attention?\nAssistant: Attention computes similarities between queries and keys, then usen normalized scores tores to combine velue vactors. Th",
+      "note": "Measured greedy generation from this training step"
+    },
+    {
+      "step": 1500,
+      "sample": "User: What is attention?\nAssistant: Attention computes similarities between queries and keys, then uses normalized scores to combine value vectors. The resu",
+      "note": "Measured greedy generation from this training step"
+    },
+    {
+      "step": 2000,
+      "sample": "User: What is attention?\nAssistant: Attention computes similarities between queries and keys, then uses normalized scores to combine value vectors. The resu",
+      "note": "Measured greedy generation from this training step"
+    }
+  ],
+  "evaluation": {
+    "scope": "Answer-token loss on held-out phrasings of known topics. Not a general intelligence benchmark. Different context sizes are part of the comparison.",
+    "baseline": {
+      "loss": 4.434571541571379,
+      "perplexity": 84.31599125084368,
+      "parameters": 813184,
+      "block_size": 128
+    },
+    "candidate": {
+      "loss": 0.247931343024846,
+      "perplexity": 1.2813719540514867
+    }
+  }
+}

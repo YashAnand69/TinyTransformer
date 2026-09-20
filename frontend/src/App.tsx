@@ -23,16 +23,21 @@ import {
 import FluidCanvas, { type FluidMode } from './components/FluidCanvas';
 import GuidedExplainer from './components/GuidedExplainer';
 import trainingReport from './data/training_history.json';
+import generationBenchmark from './data/generation_benchmark.json';
+import curriculumTopics from './data/curriculum_topics.json';
 import { MODEL_CODE, TRAIN_CODE } from './data/codebase';
-import { playTokenTick, playClick, setSoundEnabled } from './utils/audio';
+import { playClick, setSoundEnabled } from './utils/audio';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://127.0.0.1:8008' : '');
 
+interface Candidate { id: number; char: string; display?: string; prob: number }
+interface TokenStep { chosen_id: number; chosen_char: string; chosen_prob?: number; top_candidates: Candidate[] }
+interface AttentionData { tokens: string[]; weights: number[][][][]; n_layer: number; n_head: number }
 const summary = trainingReport.summary;
 const PROGRESSION_TIMELINE = trainingReport.sample_generations.map(sample => {
   const point = trainingReport.history.reduce((best, item) => Math.abs(item.step - sample.step) < Math.abs(best.step - sample.step) ? item : best);
   return { step: sample.step, loss: point.val_loss, perplexity: point.perplexity,
-    phase: sample.step === 0 ? 'Random initialization' : `Training step ${sample.step}`,
+    phase: sample.step === 0 ? 'Start of refinement' : `Training step ${sample.step}`,
     description: sample.note, sample: sample.sample };
 });
 const chartMax = Math.ceil(Math.max(...trainingReport.history.map(p => Math.max(p.train_loss, p.val_loss))));
@@ -59,7 +64,7 @@ export default function App() {
   const [fluidMode, setFluidMode] = useState<FluidMode>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('tinytransformer_fluid_mode');
-      if (saved) return saved as FluidMode;
+      if (saved && ['cobalt','obsidian','emerald','amethyst','crimson','ember','mercury','silk'].includes(saved)) return saved as FluidMode;
     }
     return 'cobalt';
   });
@@ -90,7 +95,7 @@ export default function App() {
   const [isStepping, setIsStepping] = useState<boolean>(false);
   const [streamingText, setStreamingText] = useState<string>('');
   const [generationStats, setGenerationStats] = useState<{ latency_ms: number; tokens_per_sec: number; tokens_generated: number } | null>(null);
-  const [stepDetails, setStepDetails] = useState<any[]>([]);
+  const [stepDetails, setStepDetails] = useState<TokenStep[]>([]);
   const [selectedStepIndex, setSelectedStepIndex] = useState<number | null>(null);
   const [showLogitDrawer, setShowLogitDrawer] = useState<boolean>(true);
   const [viewMode, setViewMode] = useState<'text' | 'confidence'>('text');
@@ -98,7 +103,7 @@ export default function App() {
 
   // Attention State
   const [attnInput, setAttnInput] = useState<string>('User: Who are you?');
-  const [attnData, setAttnData] = useState<any>(null);
+  const [attnData, setAttnData] = useState<AttentionData | null>(null);
   const [selectedLayer, setSelectedLayer] = useState<number>(0);
   const [selectedHead, setSelectedHead] = useState<number>(0);
   const [isAttnLoading, setIsAttnLoading] = useState<boolean>(false);
@@ -166,6 +171,7 @@ export default function App() {
   const stopGeneration = () => {
     generationRequest.current?.abort();
     if (animation.current !== null) cancelAnimationFrame(animation.current);
+    setStepDetails(prev => prev.slice(0, streamingText.length));
     setIsGenerating(false); setIsStepping(false);
   };
   useEffect(() => () => {
@@ -192,10 +198,10 @@ export default function App() {
       setGenerationStats({latency_ms:data.latency_ms,tokens_per_sec:data.tokens_per_sec,tokens_generated:data.tokens_generated});
       if (single) {
         setStreamingText(prev => prev + data.generated_text);
-        setStepDetails(prev => [...prev, ...(data.step_details || [])]);
+        setStepDetails(prev => [...prev, ...(data.step_details || []).filter((step: TokenStep) => step.chosen_char.length === 1)]);
         setIsStepping(false);
       } else {
-        setStepDetails(data.step_details || []);
+        setStepDetails((data.step_details || []).filter((step: TokenStep) => step.chosen_char.length === 1));
         const start = performance.now();
         const streamFrame = (now: number) => {
           if (controller.signal.aborted) return;
@@ -216,35 +222,15 @@ export default function App() {
   const handleStepToken = () => runGeneration(true);
 
   // Steer generation by manually clicking a candidate token
-  const handleChooseCandidate = (char: string) => {
+  const handleChooseCandidate = (candidate: Candidate) => {
+    if (isGenerating || isStepping || candidate.char.length !== 1 || !streamingText) return;
     playClick(900, 0.04);
-    if (selectedStepIndex !== null && selectedStepIndex < stepDetails.length) {
-      const prefix = streamingText.slice(0, selectedStepIndex);
-      const newStreaming = prefix + char;
-      const updatedSteps = stepDetails.slice(0, selectedStepIndex + 1);
-      if (updatedSteps[selectedStepIndex]) {
-        updatedSteps[selectedStepIndex] = {
-          ...updatedSteps[selectedStepIndex],
-          chosen_char: char
-        };
-      }
-      setStreamingText(newStreaming);
-      setStepDetails(updatedSteps);
-      playTokenTick(newStreaming.length);
-    } else {
-      const newStreaming = streamingText + char;
-      setStreamingText(newStreaming);
-      setStepDetails((prev) => [
-        ...prev,
-        {
-          chosen_char: char,
-          chosen_id: -1,
-          top_candidates: []
-        }
-      ]);
-      setSelectedStepIndex(newStreaming.length - 1);
-      playTokenTick(newStreaming.length);
-    }
+    const index = selectedStepIndex ?? streamingText.length - 1;
+    setStreamingText(streamingText.slice(0, index) + candidate.char);
+    setStepDetails(previous => previous.slice(0,index+1).map((step,i) => i === index ? {
+      ...step, chosen_id: candidate.id, chosen_char: candidate.char, chosen_prob: candidate.prob,
+    } : step));
+    setSelectedStepIndex(index); setGenerationStats(null);
   };
 
   // Keyboard shortcut for generation: Cmd + Enter / Ctrl + Enter
@@ -409,6 +395,7 @@ export default function App() {
                     {QUICK_PROMPTS.map((p, idx) => (
                       <button
                         key={idx}
+                        disabled={isGenerating || isStepping}
                         className="prompt-pill"
                         onClick={() => {
                           playClick(600, 0.02);
@@ -421,6 +408,14 @@ export default function App() {
                   </div>
                 </div>
 
+                <div className="card" style={{padding:'1rem'}}>
+                  <label htmlFor="curriculum-topic" style={{display:'block',marginBottom:'.5rem',fontSize:'.8rem'}}>Explore the {curriculumTopics.length} training topics</label>
+                  <select id="curriculum-topic" className="textarea-clean" style={{minHeight:'auto'}} value="" disabled={isGenerating || isStepping}
+                    onChange={e=>{if(e.target.value) {setPrompt(formatPrompt(e.target.value));setStreamingText('');setStepDetails([]);setGenerationStats(null);setSelectedStepIndex(null);}}}>
+                    <option value="">Choose a question…</option>
+                    {curriculumTopics.map(item=><option key={item.topic} value={item.question}>{item.question}</option>)}
+                  </select>
+                </div>
                 {/* Prompt Input Box */}
                 <div className="card" style={{ padding: '1.25rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
@@ -451,7 +446,7 @@ export default function App() {
                       className="btn-secondary"
                       onClick={() => {
                         playClick(440, 0.03);
-                        stopGeneration(); setGenerationError(''); setGenerationStats(null);
+                        stopGeneration(); setGenerationError(''); setGenerationStats(null); setSelectedStepIndex(null);
                         setPrompt('');
                         setStreamingText('');
                         setStepDetails([]);
@@ -550,8 +545,8 @@ export default function App() {
                   </div>
 
                   {/* Output Box */}
-                  <div className="output-box">
-                    <span style={{ color: 'var(--text-secondary)' }}>{prompt}</span>
+                  <div className="output-box" role="region" aria-label="Generated response" aria-busy={isGenerating || isStepping}>
+                    <span style={{ color: 'var(--text-secondary)' }}>{formatPrompt(prompt)}</span>
 
                     {viewMode === 'text' ? (
                       <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
@@ -562,7 +557,7 @@ export default function App() {
                       <span>
                         {streamingText.split('').map((char, cIdx) => {
                           const step = stepDetails[cIdx];
-                          const prob = step?.chosen_prob ?? step?.top_candidates?.[0]?.prob ?? 0.85;
+                          const prob = step?.chosen_prob ?? 0;
                           const isSelected = selectedStepIndex === cIdx;
 
                           // Color-code by probability confidence
@@ -614,7 +609,7 @@ export default function App() {
                     <div className="stats-bar" style={{ marginTop: '0.85rem' }}>
                       <span>Tokens: {generationStats.tokens_generated}</span>
                       <span>Latency: {generationStats.latency_ms} ms</span>
-                      <span>Speed: {generationStats.tokens_per_sec || 78} tok/s</span>
+                      <span>Speed: {generationStats.tokens_per_sec} tok/s</span>
                     </div>
                   )}
 
@@ -629,7 +624,7 @@ export default function App() {
                           <span style={{ fontWeight: 600 }}>
                             {selectedStepIndex !== null
                               ? `Token #${selectedStepIndex + 1} Probabilities ('${activeStep.chosen_char === ' ' ? '␣' : activeStep.chosen_char}')`
-                              : `Next Token Predictions ('${activeStep.chosen_char === ' ' ? '␣' : activeStep.chosen_char}')`}
+                              : `Candidates at this step ('${activeStep.chosen_char === ' ' ? '␣' : activeStep.chosen_char}')`}
                           </span>
                           <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>
                             (Click any candidate to steer generation)
@@ -640,14 +635,14 @@ export default function App() {
 
                       {showLogitDrawer && (
                         <div style={{ padding: '0.5rem 0 0.75rem' }}>
-                          {activeStep.top_candidates.slice(0, 5).map((cand: any, idx: number) => {
+                          {activeStep.top_candidates.slice(0, 5).map((cand: Candidate, idx: number) => {
                             const pct = Math.round((cand.prob || 0) * 100);
                             return (
                               <div
                                 key={idx}
                                 className="logit-bar-row"
                                 style={{ cursor: 'pointer' }}
-                                onClick={() => handleChooseCandidate(cand.char)}
+                                onClick={() => handleChooseCandidate(cand)}
                                 title={`Click to steer text with '${cand.display || cand.char}'`}
                               >
                                 <span className="logit-token-label">
@@ -693,9 +688,10 @@ export default function App() {
                       <input
                         type="range"
                         className="slider-clean"
-                        min="0.05"
+                        min="0"
                         max="1.5"
                         step="0.05"
+                        aria-label="Temperature"
                         value={temperature}
                         onChange={(e) => setTemperature(parseFloat(e.target.value))}
                       />
@@ -716,6 +712,7 @@ export default function App() {
                         min="1"
                         max="50"
                         step="1"
+                        aria-label="Top K"
                         value={topK}
                         onChange={(e) => setTopK(parseInt(e.target.value))}
                       />
@@ -736,6 +733,7 @@ export default function App() {
                         min="0.1"
                         max="1.0"
                         step="0.05"
+                        aria-label="Top P"
                         value={topP}
                         onChange={(e) => setTopP(parseFloat(e.target.value))}
                       />
@@ -756,6 +754,7 @@ export default function App() {
                         min="20"
                         max="240"
                         step="10"
+                        aria-label="Maximum tokens"
                         value={maxTokens}
                         onChange={(e) => setMaxTokens(parseInt(e.target.value))}
                       />
@@ -833,6 +832,14 @@ export default function App() {
             ==================================================================== */}
         {activeTab === 'loss' && (
           <div className="tab-pane">
+            <div className="card" style={{marginBottom:'1.25rem'}}>
+              <h3>Held-out phrasing evaluation</h3>
+              <p>Greedy answer exact match: {generationBenchmark.held_out.exact_matches}/{generationBenchmark.held_out.total_prompts} on held-out formats; {generationBenchmark.canonical.exact_matches}/{generationBenchmark.canonical.total_prompts} on canonical training questions.</p>
+              <p style={{fontSize:'.82rem',color:'var(--text-secondary)',lineHeight:1.7}}>
+                Answer-token loss: {trainingReport.evaluation.baseline?.loss.toFixed(3)} (previous model) → {trainingReport.evaluation.candidate.loss.toFixed(3)} (current model).
+                The underlying facts appear in training; this tests new question phrasings, not new-topic knowledge. Low loss does not guarantee a correct generated answer.
+              </p>
+            </div>
             {/* KPI Cards */}
             <div className="kpi-grid">
               <div className="kpi-card">
@@ -857,7 +864,7 @@ export default function App() {
                 </div>
               </div>
               <div className="kpi-card">
-                <div className="kpi-label">Total Optimization Steps</div>
+                <div className="kpi-label">Refinement Steps</div>
                 <div className="kpi-value">{summary.total_steps.toLocaleString()}</div>
                 <div style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)', marginTop: '0.2rem' }}>
                   Cosine learning rate schedule
@@ -888,7 +895,8 @@ export default function App() {
                 min="0"
                 max={PROGRESSION_TIMELINE.length - 1}
                 step="1"
-                value={scrubberIndex}
+                aria-label="Training step"
+                        value={scrubberIndex}
                 onChange={(e) => {
                   playClick(500 + parseInt(e.target.value) * 80, 0.02);
                   setScrubberIndex(parseInt(e.target.value));
@@ -935,7 +943,7 @@ export default function App() {
                     Convergence Trajectory (Train Loss vs. Validation Loss)
                   </h3>
                   <p style={{ fontSize: '0.76rem', color: 'var(--text-tertiary)' }}>
-                    Measured answer-token loss at each evaluation step
+                    Measured answer-token loss during refinement
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', fontSize: '0.75rem' }}>

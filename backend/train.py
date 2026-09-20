@@ -62,19 +62,25 @@ def main():
     p.add_argument('--steps',type=int,default=2400);p.add_argument('--batch-size',type=int,default=24)
     p.add_argument('--width',type=int,default=192);p.add_argument('--context',type=int,default=256)
     p.add_argument('--seed',type=int,default=2026);p.add_argument('--eval-every',type=int,default=100)
-    p.add_argument('--device',default='auto');p.add_argument('--output',type=Path,default=ROOT/'runs/v2')
+    p.add_argument('--curriculum',choices=['bootstrap','expanded'],default='expanded')
+    p.add_argument('--prefix-weight',type=float,default=8.0)
+    p.add_argument('--init',type=Path);p.add_argument('--device',default='auto');p.add_argument('--output',type=Path,default=ROOT/'runs/v2')
     args=p.parse_args()
-    if args.steps < 1 or args.batch_size < 1 or args.context < 8 or args.width%4: p.error('Invalid training dimensions')
+    if args.steps < 1 or args.batch_size < 1 or args.context < 8 or args.width%4 or args.prefix_weight <= 0: p.error('Invalid training dimensions')
     random.seed(args.seed);torch.manual_seed(args.seed)
     device = ('cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu') if args.device=='auto' else args.device
     torch.set_num_threads(4)
     args.output.mkdir(parents=True,exist_ok=True)
-    splits=save_dataset(ROOT/'data')
+    splits=save_dataset(ROOT/'data',args.curriculum)
     # Fixed printable ASCII vocabulary avoids learning the evaluation vocabulary.
     tok=CharTokenizer([chr(i) for i in range(32,127)]+['\n','\t'])
     tok.save(str(args.output/'tokenizer.json'))
     cfg=TinyTransformerConfig(block_size=args.context,vocab_size=tok.vocab_size,n_layer=4,n_head=4,d_model=args.width,dropout=.1,bias=False)
     model=TinyTransformerLM(cfg).to(device)
+    if args.init:
+        initial=torch.load(args.init,map_location=device,weights_only=True)
+        if initial['config'] != asdict(cfg): raise ValueError('Initial checkpoint configuration mismatch')
+        model.load_state_dict(initial['model_state_dict'])
     datasets={key:examples(docs,tok,cfg.block_size) for key,docs in splits.items()}
     optimizer=torch.optim.AdamW(model.parameters(),lr=8e-4,weight_decay=.05,betas=(.9,.95))
     batch_rng=torch.Generator().manual_seed(args.seed)
@@ -90,7 +96,13 @@ def main():
             x,y=(t[idx].to(device) for t in datasets['train'])
             for group in optimizer.param_groups:group['lr']=lr
             optimizer.zero_grad(set_to_none=True)
-            _,loss,_=model(x,targets=y)
+            logits,_,_=model(x)
+            token_loss=torch.nn.functional.cross_entropy(logits.flatten(0,1),y.flatten(),ignore_index=-1,reduction='none').view_as(y)
+            valid=y!=-1
+            # Emphasize the first 32 supervised tokens: picking the correct answer
+            # is harder than completing an already teacher-forced explanation.
+            weights=torch.where(valid & (valid.cumsum(1)<=32),args.prefix_weight,1.0)*valid
+            loss=(token_loss*weights).sum()/weights.sum()
             if not torch.isfinite(loss):raise RuntimeError('Non-finite training loss')
             loss.backward();torch.nn.utils.clip_grad_norm_(model.parameters(),1.0);optimizer.step()
             supervised_tokens += int((y!=-1).sum())
@@ -111,7 +123,7 @@ def main():
     test_loss=evaluate(model,datasets['test'],device)
     baseline_path=ROOT/'runs/baseline/model.pt'
     baseline=checkpoint_eval(baseline_path,ROOT/'runs/baseline/tokenizer.json',splits['test'],device) if baseline_path.exists() else None
-    summary={'model_name':'TinyTransformer-Lab-v2','parameters':model.get_num_params(),'vocab_size':tok.vocab_size,'block_size':cfg.block_size,'layers':cfg.n_layer,'heads':cfg.n_head,'d_model':cfg.d_model,'total_steps':args.steps,'best_step':checkpoint['step'],'batch_size':args.batch_size,'tokens_per_step':args.batch_size*cfg.block_size,'total_tokens_trained':args.steps*args.batch_size*cfg.block_size,'supervised_tokens':supervised_tokens,'training_duration_sec':round(time.time()-start,2),'device':device,'seed':args.seed,'best_val_loss':round(best,5),'final_train_loss':history[-1]['train_loss'],'final_val_loss':history[-1]['val_loss'],'final_perplexity':history[-1]['perplexity'],'test_loss':test_loss,'test_perplexity':math.exp(min(test_loss,20))}
+    summary={'model_name':'TinyTransformer-Lab-v2','parameters':model.get_num_params(),'vocab_size':tok.vocab_size,'block_size':cfg.block_size,'layers':cfg.n_layer,'heads':cfg.n_head,'d_model':cfg.d_model,'total_steps':args.steps,'best_step':checkpoint['step'],'batch_size':args.batch_size,'tokens_per_step':args.batch_size*cfg.block_size,'total_tokens_trained':args.steps*args.batch_size*cfg.block_size,'supervised_tokens':supervised_tokens,'training_duration_sec':round(time.time()-start,2),'device':device,'seed':args.seed,'initial_checkpoint':str(args.init) if args.init else None,'answer_prefix_weight':args.prefix_weight,'curriculum':args.curriculum,'best_val_loss':round(best,5),'final_train_loss':history[-1]['train_loss'],'final_val_loss':history[-1]['val_loss'],'final_perplexity':history[-1]['perplexity'],'test_loss':test_loss,'test_perplexity':math.exp(min(test_loss,20))}
     report={'summary':summary,'history':history,'sample_generations':samples,'evaluation':{'scope':'Answer-token loss on held-out phrasings of known topics. Not a general intelligence benchmark. Different context sizes are part of the comparison.','baseline':baseline,'candidate':{'loss':test_loss,'perplexity':math.exp(min(test_loss,20))}}}
     (args.output/'training_history.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps(report['evaluation']),flush=True)

@@ -1,0 +1,302 @@
+{
+  "loss": 0.00014864591724566924,
+  "perplexity": 1.0001486569655975,
+  "parameters": 1838016,
+  "block_size": 256,
+  "exact_matches": 57,
+  "total_prompts": 58,
+  "exact_match_rate": 0.9827586206896551,
+  "samples": [
+    {
+      "prompt": "User: Who are you?\nAssistant: ",
+      "expected": "I am TinyTransformer, a small language model trained from scratch. I explain machine learning concepts. I can make mistakes and I am not a general-purpose assistant.",
+      "generated": "I am TinyTransformer, a small language model trained from scratch. I explain machine learning concepts. I can make mistakes and I am not a general-purpose assistant."
+    },
+    {
+      "prompt": "User: What is your architecture?\nAssistant: ",
+      "expected": "I use four causal transformer layers, four attention heads, 192 embedding dimensions, and a 256-character context window. My weights are learned from random initialization.",
+      "generated": "I use four causal transformer layers, four attention heads, 192 embedding dimensions, and a 256-character context window. My weights are learned from random initialization."
+    },
+    {
+      "prompt": "User: What is attention?\nAssistant: ",
+      "expected": "Attention computes similarities between queries and keys, then uses normalized scores to combine value vectors. The result lets each token use relevant earlier context.",
+      "generated": "Attention computes similarities between queries and keys, then uses normalized scores to combine value vectors. The result lets each token use relevant earlier context."
+    },
+    {
+      "prompt": "User: How do you generate text?\nAssistant: ",
+      "expected": "I predict the next character from the current context, append it, and repeat. This is autoregressive generation. I stop at an end token or the generation limit.",
+      "generated": "I predict the next character from the current context, append it, and repeat. This is autoregressive generation. I stop at an end token or the generation limit."
+    },
+    {
+      "prompt": "User: What is sampling temperature?\nAssistant: ",
+      "expected": "Temperature divides logits before softmax. Lower values concentrate probability on likely tokens. Higher values spread probability more widely. Zero selects the most likely token.",
+      "generated": "Temperature divides logits before softmax. Lower values concentrate probability on likely tokens. Higher values spread probability more widely. Zero selects the most likely token."
+    },
+    {
+      "prompt": "User: What is top-k sampling?\nAssistant: ",
+      "expected": "Top-k sampling keeps only the k most likely tokens before sampling. A small k reduces variety. Setting k to zero disables this filter.",
+      "generated": "Top-k sampling keeps only the k most likely tokens before sampling. A small k reduces variety. Setting k to zero disables this filter."
+    },
+    {
+      "prompt": "User: What is top-p sampling?\nAssistant: ",
+      "expected": "Top-p sampling retains the smallest ranked set whose cumulative probability reaches p. It adapts the number of candidates to the probability distribution.",
+      "generated": "Top-p sampling retains the smallest ranked set whose cumulative probability reaches p. It adapts the number of candidates to the probability distribution."
+    },
+    {
+      "prompt": "User: What is the causal mask?\nAssistant: ",
+      "expected": "The causal mask prevents a position from attending to later positions. Future scores are set to negative infinity before softmax, so their attention probability is zero.",
+      "generated": "The causal mask prevents a position from attending to later positions. Future scores are set to negative infinity before softmax, so their attention probability is zero."
+    },
+    {
+      "prompt": "User: Why train from scratch instead of fine-tuning?\nAssistant: ",
+      "expected": "Training from scratch learns all weights from random initialization. Fine-tuning adapts a pretrained model. Starting from scratch is useful for studying how learning works, but requires data and compute.",
+      "generated": "Training from scratch learns all weights from random initialization. Fine-tuning adapts a pretrained model. Starting from scratch is useful for studying how learning works, requta and compute."
+    },
+    {
+      "prompt": "User: What is backpropagation?\nAssistant: ",
+      "expected": "Backpropagation applies the chain rule to compute gradients of the loss with respect to parameters. An optimizer uses those gradients to update the weights. It does not guarantee a global minimum.",
+      "generated": "Backpropagation applies the chain rule to compute gradients of the loss with respect to parameters. An optimizer uses those gradients to update the weights. It does not guarantee a global minimum."
+    },
+    {
+      "prompt": "User: What is a context window?\nAssistant: ",
+      "expected": "The context window is the maximum number of input tokens the model can use at once. Here a token is a character. Older context is cropped when it exceeds the window.",
+      "generated": "The context window is the maximum number of input tokens the model can use at once. Here a token is a character. Older context is cropped when it exceeds the window."
+    },
+    {
+      "prompt": "User: What is tokenization?\nAssistant: ",
+      "expected": "Tokenization converts text into integer IDs. This model uses character tokens, including spaces and punctuation. Unknown characters map to a special unknown token.",
+      "generated": "Tokenization converts text into integer IDs. This model uses character tokens, including spaces and punctuation. Unknown characters map to a special unknown token."
+    },
+    {
+      "prompt": "User: What are embeddings?\nAssistant: ",
+      "expected": "An embedding table maps each discrete token ID to a learned vector. These vectors let the transformer process tokens with continuous arithmetic.",
+      "generated": "An embedding table maps each discrete token ID to a learned vector. These vectors let the transformer process tokens with continuous arithmetic."
+    },
+    {
+      "prompt": "User: What are position embeddings?\nAssistant: ",
+      "expected": "Position embeddings add information about a token position to its token vector. This model learns a separate vector for each position; it does not use sinusoidal position encodings.",
+      "generated": "Position embeddings add information about a token position to its token vector. This model learns a separate vector for each position; it does not use sinusoidal position encodings."
+    },
+    {
+      "prompt": "User: What is a query vector?\nAssistant: ",
+      "expected": "A query is a learned projection of the current token representation. Its dot products with keys determine which earlier positions receive attention.",
+      "generated": "A query is a learned projection of the current token representation. Its dot products with keys determine which earlier positions receive attention."
+    },
+    {
+      "prompt": "User: What is a key vector?\nAssistant: ",
+      "expected": "A key is a learned projection used for matching against queries. A high query-key score can give that position more weight after normalization.",
+      "generated": "A key is a learned projection used for matching against queries. A high query-key score can give that position more weight after normalization."
+    },
+    {
+      "prompt": "User: What is a value vector?\nAssistant: ",
+      "expected": "A value is a learned projection containing information to aggregate. Attention scores weight the values, and their weighted sum becomes the attention output.",
+      "generated": "A value is a learned projection containing information to aggregate. Attention scores weight the values, and their weighted sum becomes the attention output."
+    },
+    {
+      "prompt": "User: Why use multiple attention heads?\nAssistant: ",
+      "expected": "Each head projects tokens into a different subspace and computes its own attention weights. The head outputs are concatenated and projected back to the model dimension.",
+      "generated": "Each head projects tokens into a different subspace and computes its own attention weights. The head outputs are concatenated and projected back to the model dimension."
+    },
+    {
+      "prompt": "User: Why scale attention scores?\nAssistant: ",
+      "expected": "Attention divides query-key dot products by the square root of the head dimension. This helps keep score magnitudes and softmax gradients well behaved.",
+      "generated": "Attention divides query-key dot products by the square root of the head dimension. This helps keep score magnitudes and softmax gradients well behaved."
+    },
+    {
+      "prompt": "User: What is softmax?\nAssistant: ",
+      "expected": "Softmax turns logits into positive probabilities that sum to one. Subtracting the largest logit before exponentiation improves numerical stability without changing the probabilities.",
+      "generated": "Softmax turns logits into positive probabilities that sum to one. Subtracting the largest logit before exponentiation improves numerical stability without changing the probabilities."
+    },
+    {
+      "prompt": "User: What are logits?\nAssistant: ",
+      "expected": "Logits are unnormalized scores for each possible next token. Softmax converts them into probabilities. They are scores, not probabilities themselves.",
+      "generated": "Logits are unnormalized scores for each possible next token. Softmax converts them into probabilities. They are scores, not probabilities themselves."
+    },
+    {
+      "prompt": "User: What is cross-entropy loss?\nAssistant: ",
+      "expected": "Cross entropy is the negative log probability assigned to the correct next token. Lower loss means the model assigns more probability to observed targets.",
+      "generated": "Cross entropy is the negative log probability assigned to the correct next token. Lower loss means the model assigns more probability to observed targets."
+    },
+    {
+      "prompt": "User: What is perplexity?\nAssistant: ",
+      "expected": "Perplexity is the exponential of average cross-entropy loss. Lower is better on the same dataset and tokenizer. Character and word perplexities are not directly comparable.",
+      "generated": "Perplexity is the exponential of average cross-entropy loss. Lower is better on the same dataset and tokenizer. Character and word perplexities are not directly comparable."
+    },
+    {
+      "prompt": "User: What is a validation set?\nAssistant: ",
+      "expected": "Validation examples are excluded from gradient updates and used to select a checkpoint. A separate test set is used for the final evaluation.",
+      "generated": "Validation examples are excluded from gradient updates and used to select a checkpoint. A separate test set is used for the final evaluation."
+    },
+    {
+      "prompt": "User: What is data leakage?\nAssistant: ",
+      "expected": "Data leakage occurs when evaluation information enters training. Duplicated documents across splits can make validation scores look much better than real generalization.",
+      "generated": "Data leakage occurs when evaluation information enters training. Duplicated documents across splits can make validation scores look much better than real generalization."
+    },
+    {
+      "prompt": "User: What is overfitting?\nAssistant: ",
+      "expected": "Overfitting means learning training-specific patterns that do not transfer to new examples. A widening gap between training and validation loss can be a warning sign.",
+      "generated": "Overfitting means learning training-specific patterns that do not transfer to new examples. A widening gap between training and validation loss can be a warning sign."
+    },
+    {
+      "prompt": "User: What is dropout?\nAssistant: ",
+      "expected": "Dropout randomly zeros activations during training as regularization. It is disabled during evaluation and generation so the model uses its full representation.",
+      "generated": "Dropout randomly zeros activations during training as regularization. It is disabled during evaluation and generation so the model uses its full representation."
+    },
+    {
+      "prompt": "User: What is layer normalization?\nAssistant: ",
+      "expected": "Layer normalization normalizes features within each token representation using their mean and variance. It helps stabilize optimization in deep networks.",
+      "generated": "Layer normalization normalizes features within each token representation using their mean and variance. It helps stabilize optimization in deep networks."
+    },
+    {
+      "prompt": "User: What are residual connections?\nAssistant: ",
+      "expected": "A residual connection adds a module input to its output. This creates a direct path for information and gradients through successive transformer layers.",
+      "generated": "A residual connection adds a module input to its output. This creates a direct path for information and gradients through successive transformer layers."
+    },
+    {
+      "prompt": "User: What is GELU?\nAssistant: ",
+      "expected": "GELU is a smooth nonlinear activation used in the feed-forward network. Nonlinearity allows the network to learn more than a single linear transformation.",
+      "generated": "GELU is a smooth nonlinear activation used in the feed-forward network. Nonlinearity allows the network to learn more than a single linear transformation."
+    },
+    {
+      "prompt": "User: What is the feed-forward network?\nAssistant: ",
+      "expected": "The feed-forward network applies a linear expansion, GELU activation, and linear projection independently to each token. Here its hidden width is four times the embedding width.",
+      "generated": "The feed-forward network applies a linear expansion, GELU activation, and linear projection independently to each token. Here its hidden width is four times the embedding width."
+    },
+    {
+      "prompt": "User: What is AdamW?\nAssistant: ",
+      "expected": "AdamW is an adaptive optimizer with decoupled weight decay. It tracks moving averages of gradients and squared gradients to scale parameter updates.",
+      "generated": "AdamW is an adaptive optimizer with decoupled weight decay. It tracks moving averages of gradients and squared gradients to scale parameter updates."
+    },
+    {
+      "prompt": "User: What is the learning rate?\nAssistant: ",
+      "expected": "The learning rate controls the size of optimizer updates. Too large can destabilize training; too small can slow learning. Warmup and decay help manage it over a run.",
+      "generated": "The learning rate controls the size of optimizer updates. Too large can destabilize training; too small can slow learning. Warmup and decay help manage it over a run."
+    },
+    {
+      "prompt": "User: Why use learning rate warmup?\nAssistant: ",
+      "expected": "Warmup gradually increases the learning rate near the start of training. This can reduce unstable updates while the model and optimizer statistics are still settling.",
+      "generated": "Warmup gradually increases the learning rate near the start of training. This can reduce unstable updates while the model and optimizer statistics are still settling."
+    },
+    {
+      "prompt": "User: What is cosine learning rate decay?\nAssistant: ",
+      "expected": "Cosine decay smoothly lowers the learning rate from a peak toward a minimum. Smaller late updates help refine the learned weights.",
+      "generated": "Cosine decay smoothly lowers the learning rate from a peak toward a minimum. Smaller late updates help refine the learned weights."
+    },
+    {
+      "prompt": "User: What is gradient clipping?\nAssistant: ",
+      "expected": "Gradient clipping limits the gradient norm before an optimizer update. It can prevent occasional large gradients from causing excessively large parameter changes.",
+      "generated": "Gradient clipping limits the gradient norm before an optimizer update. It can prevent occasional large gradients from causing excessively large parameter changes."
+    },
+    {
+      "prompt": "User: What is weight decay?\nAssistant: ",
+      "expected": "Weight decay discourages large parameter values. With AdamW it is applied separately from the gradient-based adaptive update.",
+      "generated": "Weight decay discourages large parameter values. With AdamW it is applied separately from the gradient-based adaptive update."
+    },
+    {
+      "prompt": "User: What is weight tying?\nAssistant: ",
+      "expected": "Weight tying shares the token embedding matrix with the output projection. It reduces parameter count and connects input token representations to output token scores.",
+      "generated": "Weight tying shares the token embedding matrix with the output projection. It reduces parameter count and connects input token representations to output token scores."
+    },
+    {
+      "prompt": "User: What is batch size?\nAssistant: ",
+      "expected": "Batch size is the number of examples used for one gradient estimate. Larger batches use more memory and change the noise in the gradient estimate.",
+      "generated": "Batch size is the number of examples used for one gradient estimate. Larger batches use more memory and change the noise in the gradient estimate."
+    },
+    {
+      "prompt": "User: What is a checkpoint?\nAssistant: ",
+      "expected": "A checkpoint saves model weights and configuration. A resumable training checkpoint also saves optimizer state, the step, and random generator states.",
+      "generated": "A checkpoint saves model weights and configuration. A resumable training checkpoint also saves optimizer state, the step, and random generator states."
+    },
+    {
+      "prompt": "User: Why use a random seed?\nAssistant: ",
+      "expected": "A seed makes random initialization and sampling repeatable within a controlled environment. Exact results can still differ across hardware or software versions.",
+      "generated": "A seed makes random initialization and sampling repeatable within a controlled environment. Exact results can still differ across hardware or software versions."
+    },
+    {
+      "prompt": "User: What is inference?\nAssistant: ",
+      "expected": "Inference runs a trained model to produce predictions without updating its weights. Dropout is disabled and gradients are not needed.",
+      "generated": "Inference runs a trained model to produce predictions without updating its weights. Dropout is disabled and gradients are not needed."
+    },
+    {
+      "prompt": "User: What is ONNX?\nAssistant: ",
+      "expected": "ONNX is a portable representation of a model computation graph and weights. This project exports its trained transformer so the website can run CPU inference without PyTorch.",
+      "generated": "ONNX is a portable representation of a model computation graph and weights. This project exports its trained transformer so the website can run CPU inference without PyTorch."
+    },
+    {
+      "prompt": "User: How do CPUs and GPUs differ?\nAssistant: ",
+      "expected": "CPUs handle diverse sequential work, while GPUs can execute many arithmetic operations in parallel. Model size, batching, and transfer overhead determine which is faster.",
+      "generated": "CPUs handle diverse sequential work, while GPUs can execute many arithmetic operations in parallel. Model size, batching, and transfer overhead determine which is faster."
+    },
+    {
+      "prompt": "User: What is MPS?\nAssistant: ",
+      "expected": "MPS is the PyTorch backend for accelerated tensor operations on supported Apple GPUs. This project can also train on CUDA or CPU.",
+      "generated": "MPS is the PyTorch backend for accelerated tensor operations on supported Apple GPUs. This project can also train on CUDA or CPU."
+    },
+    {
+      "prompt": "User: What is a hallucination?\nAssistant: ",
+      "expected": "A hallucination is generated content that is incorrect or unsupported. A language model predicts text; high token probability does not guarantee factual accuracy.",
+      "generated": "A hallucination is generated content that is incorrect or unsupported. A language model predicts text; high token probability does not guarantee factual accuracy."
+    },
+    {
+      "prompt": "User: What are your limitations?\nAssistant: ",
+      "expected": "I am a small educational model trained on a narrow synthetic curriculum. I can repeat learned explanations but may fail on unfamiliar questions. I cannot browse the web or verify facts.",
+      "generated": "I am a small educational model trained on a narrow synthetic curriculum. I can repeat learned explanations but may fail on unfamiliar questions. I cannot browse the web or verify facts."
+    },
+    {
+      "prompt": "User: Can you solve any problem?\nAssistant: ",
+      "expected": "No. My training is limited to short educational examples. Fluent output is not proof of reasoning or correctness. Use the model to explore transformers, not for important decisions.",
+      "generated": "No. My training is limited to short educational examples. Fluent output is not proof of reasoning or correctness. Use the model to explore transformers, not for important decisions."
+    },
+    {
+      "prompt": "User: Do you remember my messages?\nAssistant: ",
+      "expected": "A generation request supplies a temporary context. The model weights do not change during a conversation. Hosting infrastructure may still keep request logs.",
+      "generated": "A generation request supplies a temporary context. The model weights do not change during a conversation. Hosting infrastructure may still keep request logs."
+    },
+    {
+      "prompt": "User: What is an end token?\nAssistant: ",
+      "expected": "An end token marks the end of a training example or response. During generation it lets the model stop before reaching the maximum token budget.",
+      "generated": "An end token marks the end of a training example or response. During generation it lets the model stop before reaching the maximum token budget."
+    },
+    {
+      "prompt": "User: What is greedy decoding?\nAssistant: ",
+      "expected": "Greedy decoding always selects the token with the highest score. It is deterministic for fixed weights and context, but does not guarantee the best whole sequence.",
+      "generated": "Greedy decoding always selects the token with the highest score. It is deterministic for fixed weights and context, but does not guarantee the best whole sequence."
+    },
+    {
+      "prompt": "User: Do attention weights explain everything?\nAssistant: ",
+      "expected": "No. Attention weights show how one module mixes positions. Residual streams and feed-forward layers also affect predictions, so a heatmap is not a complete causal explanation.",
+      "generated": "No. Attention weights show how one module mixes positions. Residual streams and feed-forward layers also affect predictions, so a heatmap is not a complete causal explanation."
+    },
+    {
+      "prompt": "User: What were you trained on?\nAssistant: ",
+      "expected": "I was trained on a small original curriculum of machine learning questions and answers. Evaluation holds out question phrasings, while the underlying topics overlap with training.",
+      "generated": "I was trained on a small original curriculum of machine learning questions and answers. Evaluation holds out question phrasings, while the underlying topics overlap with training."
+    },
+    {
+      "prompt": "User: What is silicon transmutation?\nAssistant: ",
+      "expected": "Silicon transmutation is a fictional metaphor from this project: turning electrical signals into structured computation. It is not a scientific claim about consciousness.",
+      "generated": "Silicon transmutation is a fictional metaphor from this project: turning electrical signals into structured computation. It is not a scientific claim about consciousness."
+    },
+    {
+      "prompt": "User: What is fine-tuning?\nAssistant: ",
+      "expected": "Fine-tuning continues training an existing pretrained model on new examples. It can adapt behavior efficiently, but still requires careful data selection and evaluation.",
+      "generated": "Fine-tuning continues training an existing pretrained model on new examples. It can adapt behavior efficiently, but still requires careful data selection and evaluation."
+    },
+    {
+      "prompt": "User: What is generalization?\nAssistant: ",
+      "expected": "Generalization is performance on examples outside the training set. Testing a paraphrase of a known topic is easier than answering an entirely unseen topic.",
+      "generated": "Generalization is performance on examples outside the training set. Testing a paraphrase of a known topic is easier than answering an entirely unseen topic."
+    },
+    {
+      "prompt": "User: Why switch between train and eval mode?\nAssistant: ",
+      "expected": "Training mode enables operations such as dropout. Evaluation mode disables them. Forgetting to restore training mode after generating a sample can silently change a training run.",
+      "generated": "Training mode enables operations such as dropout. Evaluation mode disables them. Forgetting to restore training mode after generating a sample can silently change a training run."
+    },
+    {
+      "prompt": "User: Does a larger model always work better?\nAssistant: ",
+      "expected": "No. More parameters increase capacity and compute cost, but data quality and evaluation matter too. A larger model can overfit a small dataset.",
+      "generated": "No. More parameters increase capacity and compute cost, but data quality and evaluation matter too. A larger model can overfit a small dataset."
+    }
+  ],
+  "scope": "Canonical training questions; a memorization check, not generalization."
+}

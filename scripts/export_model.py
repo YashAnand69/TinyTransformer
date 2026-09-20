@@ -27,3 +27,16 @@ with torch.no_grad():
     logits, attention = Export().eval()(ids)
 (root / 'scripts/reference.json').write_text(json.dumps({'ids':ids[0].tolist(), 'logits':logits[0].tolist(), 'attention':attention.tolist()}))
 print('Exported trained weights and PyTorch reference outputs.')
+# Check dynamic shape behavior at the shortest and longest supported contexts.
+reference = json.loads((root/'scripts/reference.json').read_text())
+reference['boundary_cases'] = []
+with torch.no_grad():
+    for text in ['A', 'User: What is attention?\nAssistant: ' * 10]:
+        case_ids = tok.encode(text)[-model.config.block_size:]
+        case_logits, _ = Export().eval()(torch.tensor([case_ids]))
+        reference['boundary_cases'].append({'ids':case_ids,'logits':case_logits[0].tolist()})
+    prompt = 'User: What is attention?\nAssistant: '
+    ctx = torch.tensor([tok.encode(prompt)])
+    output, _ = model.generate(ctx, 60, temperature=0, eos_token_id=tok.eos_token_id)
+    reference['greedy'] = {'prompt':prompt,'text':tok.decode(output[0,ctx.shape[1]:].tolist()),'max_new_tokens':60}
+(root/'scripts/reference.json').write_text(json.dumps(reference)+'\n')

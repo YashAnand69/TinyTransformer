@@ -1,0 +1,14 @@
+{
+  "held_out": {
+    "exact_matches": 26,
+    "total_prompts": 58,
+    "exact_match_rate": 0.4482758620689655,
+    "scope": "Held-out question phrasings of seen facts. Teacher-forced answer loss does not measure free-generation factual accuracy."
+  },
+  "canonical": {
+    "exact_matches": 57,
+    "total_prompts": 58,
+    "exact_match_rate": 0.9827586206896551,
+    "scope": "Canonical training questions; a memorization check, not generalization."
+  }
+}

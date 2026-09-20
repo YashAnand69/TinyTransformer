@@ -105,7 +105,7 @@ def model_info():
         return {"status": "Model still training or initializing"}
 
     return {
-        "model_name": "TinyTransformer-Alchemist",
+        "model_name": "TinyTransformer-Lab-v2",
         "architecture": "Causal Decoder-Only Transformer (GPT Architecture)",
         "parameters": model.get_num_params(),
         "vocab_size": tokenizer.vocab_size,

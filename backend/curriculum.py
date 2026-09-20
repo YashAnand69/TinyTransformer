@@ -68,24 +68,43 @@ LESSONS = [
 ('parameter count', 'Does a larger model always work better?', 'No. More parameters increase capacity and compute cost, but data quality and evaluation matter too. A larger model can overfit a small dataset.'),
 ]
 
-def build_splits():
+def build_splits(stage="expanded"):
     splits = {'train': [], 'validation': [], 'test': []}
     for topic, question, answer in LESSONS:
-        questions = [question, f'Explain {topic}.', f'Tell me about {topic}.', f'Please describe {topic}.', f'I want to understand {topic}.', f'Give a short explanation of {topic}.', f'In simple terms, explain {topic}.', f'Can you explain {topic} briefly?']
-        for i, q in enumerate(questions):
-            split = 'train' if i < 6 else 'validation' if i == 6 else 'test'
+        training_questions = [question] + [template.format(topic=topic) for template in [
+            'Explain {topic}.', 'Tell me about {topic}.', 'Please describe {topic}.',
+            'I want to understand {topic}.', 'Give a short explanation of {topic}.',
+            'Can you explain {topic}?', 'Describe {topic} briefly.',
+            'Please explain {topic} in simple terms.', 'What does {topic} mean?',
+            'How would you describe {topic}?', 'Teach me about {topic}.',
+            'Give me a brief overview of {topic}.', 'I have a question about {topic}.',
+            'Explain the idea of {topic}.', 'What should I know about {topic}?',
+            'Could you describe {topic}?', 'Explain {topic} to a beginner.',
+            'Help me understand {topic}.', 'In a few sentences, describe {topic}.',
+            'Briefly explain {topic}.', 'What is meant by {topic}?',
+            'Can you tell me about {topic}?', 'I am learning about {topic}.',
+        ]]
+        questions = [(q, 'train') for q in training_questions]
+        questions += [(f'In simple terms, explain {topic}.', 'validation'),
+                      (f'Can you explain {topic} briefly?', 'validation'),
+                      (f'Could you explain {topic} in a few sentences?', 'test')]
+        if stage == 'bootstrap':
+            questions = [(q,'train') for q in training_questions[:6]] + [
+                (f'In simple terms, explain {topic}.','validation'),
+                (f'Can you explain {topic} briefly?','test')]
+        for q, split in questions:
             text = f'User: {q}\nAssistant: {answer}'
             splits[split].append({'topic':topic, 'question':q, 'answer':answer, 'text':text, 'id':hashlib.sha256(text.encode()).hexdigest()[:16]})
     return splits
 
-def save_dataset(directory):
+def save_dataset(directory, stage="expanded"):
     directory = Path(directory); directory.mkdir(parents=True, exist_ok=True)
-    splits = build_splits()
+    splits = build_splits(stage)
     for split, docs in splits.items():
         (directory / f'{split}.json').write_text(json.dumps(docs, indent=2)+'\n')
     corpus = '\n\n'.join(d['text'] for d in splits['train'])
     (directory/'corpus.txt').write_text(corpus)
-    manifest = {'version':2, 'source':'Original synthetic educational curriculum maintained in curriculum.py', 'evaluation_scope':'Held-out question phrasings of known topics; not unseen-topic generalization.', 'topics':len(LESSONS), 'counts':{k:len(v) for k,v in splits.items()}, 'sha256':{k:hashlib.sha256(json.dumps(v,sort_keys=True).encode()).hexdigest() for k,v in splits.items()}}
+    manifest = {'version':2, 'stage':stage, 'source':'Original synthetic educational curriculum maintained in curriculum.py', 'evaluation_scope':'Held-out question phrasings of known topics; not unseen-topic generalization.', 'topics':len(LESSONS), 'counts':{k:len(v) for k,v in splits.items()}, 'sha256':{k:hashlib.sha256(json.dumps(v,sort_keys=True).encode()).hexdigest() for k,v in splits.items()}}
     (directory/'dataset_manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     return splits
 
