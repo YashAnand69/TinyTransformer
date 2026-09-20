@@ -1,0 +1,12 @@
+.git
+.netlify
+backend/.venv
+backend/runs
+backend/checkpoints/*.pt
+backend/__pycache__
+frontend/node_modules
+frontend/dist
+node_modules
+docs
+.DS_Store
+**/.DS_Store

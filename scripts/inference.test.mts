@@ -3,6 +3,19 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { forward, generate } from '../netlify/functions/_shared/inference.mts';
 import api from '../netlify/functions/api.mts';
+import vercel from '../api/[route].ts';
+test('Vercel fetch adapter loads the model and generates using packaged artifacts', async () => {
+  const health = await vercel.fetch(new Request('https://test/api/health'));
+  assert.equal(health.status, 200);
+  assert.equal((await health.json()).model_loaded, true);
+  const reference = JSON.parse(await readFile('scripts/reference.json', 'utf8'));
+  const response = await vercel.fetch(new Request('https://test/api/generate', {
+    method: 'POST',
+    body: JSON.stringify({...reference.greedy, temperature: 0, top_k: 0, top_p: 1}),
+  }));
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).generated_text, reference.greedy.text);
+});
 test('ONNX logits and attention match the trained PyTorch checkpoint', async () => {
   const reference = JSON.parse(await readFile('scripts/reference.json','utf8'));
   const actual = await forward(reference.ids);

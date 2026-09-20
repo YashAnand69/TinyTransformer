@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "npm ci",
+  "buildCommand": "npm run build",
+  "outputDirectory": "frontend/dist",
+  "functions": {
+    "api/[route].ts": {
+      "maxDuration": 60,
+      "includeFiles": "{netlify/model/**,backend/data/tokenizer.json,backend/data/corpus.txt,backend/checkpoints/training_history.json,node_modules/onnxruntime-web/dist/**}"
+    }
+  },
+  "rewrites": [
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
+}

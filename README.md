@@ -133,6 +133,23 @@ selects another API at build time. There are no required third-party model keys.
 The existing site may require Netlify team login. GitHub CI validates commits;
 production deployment remains a separate, manual step.
 
+## Vercel
+
+Deploy from the repository root, using Node.js 24 and the Other framework preset:
+
+```bash
+npm ci
+npm test
+npx vercel --prod
+```
+
+`vercel.json` builds the dashboard into `frontend/dist` and packages the trained
+ONNX model, tokenizer, metrics, and WebAssembly runtime with `api/[route].ts`.
+The adapter shares the validated inference handler with Netlify. The dashboard
+calls the same-origin `/api` endpoints; no external model key or local backend
+is required. Keep the Vercel project's Root Directory at the repository root.
+Deployment requires a Vercel account with access to the target project.
+
 ## Project map
 
 - `backend/model.py`: transformer and sampling
