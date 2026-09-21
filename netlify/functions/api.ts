@@ -1,7 +1,7 @@
 import type { Config } from '@netlify/functions';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { getSystem, forward, generate, tokenize } from './_shared/inference.mts';
+import { getSystem, forward, generate, tokenize } from './_shared/inference.ts';
 
 export default async (req: Request) => {
   const route = new URL(req.url).pathname.split('/').pop();

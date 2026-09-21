@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { forward, generate } from '../netlify/functions/_shared/inference.mts';
-import api from '../netlify/functions/api.mts';
+import { forward, generate } from '../netlify/functions/_shared/inference.ts';
+import api from '../netlify/functions/api.ts';
 import vercel from '../api/[route].ts';
 test('Vercel fetch adapter loads the model and generates using packaged artifacts', async () => {
   const health = await vercel.fetch(new Request('https://test/api/health'));

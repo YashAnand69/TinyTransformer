@@ -4,8 +4,9 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
     "noEmit": true,
     "skipLibCheck": true
   },
-  "include": ["api/**/*.ts", "netlify/functions/**/*.mts"]
+  "include": ["api/**/*.ts", "netlify/functions/**/*.ts"]
 }
