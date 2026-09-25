@@ -27,6 +27,7 @@ import generationBenchmark from './data/generation_benchmark.json';
 import curriculumTopics from './data/curriculum_topics.json';
 import { MODEL_CODE, TRAIN_CODE } from './data/codebase';
 import { playClick, setSoundEnabled } from './utils/audio';
+import './App.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://127.0.0.1:8008' : '');
 
@@ -259,30 +260,24 @@ export default function App() {
   const currentScrubberItem = PROGRESSION_TIMELINE[scrubberIndex];
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+    <div className="app-shell">
       {/* 3D Specular Navier-Stokes Fluid Dynamics Canvas (Layered in Background) */}
-      <FluidCanvas intensity={0.85} mode={fluidMode} />
+      <FluidCanvas intensity={0.36} mode={fluidMode} />
 
       {/* Clean Minimalist Header */}
       <header className="app-header">
         <div className="container header-inner">
           <div className="brand-group">
-            <span className="brand-title">TinyTransformer</span>
-            <span className="badge-tag">{(summary.parameters / 1e6).toFixed(2)}M Params</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
-              <span style={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                backgroundColor: backendOnline ? '#22c55e' : '#f59e0b',
-                display: 'inline-block'
-              }} />
+            <span className="brand-mark" aria-hidden="true"><span /></span>
+            <span className="brand-copy"><span className="brand-title">TinyTransformer</span><span className="brand-subtitle">MODEL LAB / V2</span></span>
+            <div className={`engine-status ${backendOnline ? 'is-online' : ''}`} role="status" aria-label={backendOnline ? `${backendDevice} active` : backendOnline === null ? 'Connecting to model' : 'Model engine offline'}>
+              <span className="engine-dot" />
               <span>{backendOnline ? `${backendDevice} Active` : backendOnline === null ? 'Connecting…' : 'Engine Offline'}</span>
             </div>
           </div>
 
           {/* Segmented Tab Navigation */}
-          <nav className="nav-segmented">
+          <nav className="nav-segmented" aria-label="Lab sections">
             <button
               className={`nav-btn ${activeTab === 'playground' ? 'active' : ''}`}
               onClick={() => setActiveTab('playground')}
@@ -321,7 +316,7 @@ export default function App() {
           </nav>
 
           {/* Quick Header Controls (Fluid & Sound) */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div className="header-actions">
             
             {/* Fluid Mode Selector */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255, 255, 255, 0.04)', padding: '2px 6px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
@@ -373,12 +368,29 @@ export default function App() {
       </header>
 
       {/* Main Content Area */}
-      <main className="container" style={{ flex: 1, padding: '1.75rem 1.5rem 3rem' }}>
+      <main className="container main-content">
+        <section className="lab-intro" aria-labelledby="lab-title">
+          <div className="intro-copy">
+            <div className="eyebrow"><span className="eyebrow-line" /> AN OPEN MODEL EXPERIMENT</div>
+            <h1 id="lab-title">See every token <em>take shape.</em></h1>
+            <p>Write a prompt, generate a response, and inspect the tokens, attention, and training behind every answer.</p>
+            <div className="intro-actions">
+              <button className="intro-primary" onClick={() => { setActiveTab('playground'); window.setTimeout(() => document.getElementById('prompt-input')?.focus(), 0); }}><Play size={15} fill="currentColor" /> Try the playground</button>
+              <button className="intro-link" onClick={() => setActiveTab('architecture')}>Explore the model <span aria-hidden="true">↗</span></button>
+            </div>
+          </div>
+          <div className="intro-visual" aria-label="Model specification summary">
+            <div className="visual-head"><span className="live-indicator" /> LIVE INFERENCE <span>001 / TINY</span></div>
+            <div className="model-orbit" aria-hidden="true"><span className="orbit orbit-one" /><span className="orbit orbit-two" /><span className="orbit-core">T</span><span className="orbit-node node-one" /><span className="orbit-node node-two" /><span className="orbit-node node-three" /></div>
+            <div className="visual-stats"><div><strong>{(summary.parameters / 1e6).toFixed(2)}M</strong><span>PARAMETERS</span></div><div><strong>4 × 4</strong><span>LAYERS / HEADS</span></div><div><strong>{summary.block_size}</strong><span>CHAR CONTEXT</span></div></div>
+          </div>
+        </section>
+        <div className="section-heading"><div><span className="section-kicker">{activeTab === 'playground' ? '01 / INTERACT' : activeTab === 'loss' ? '02 / LEARN' : activeTab === 'attention' ? '03 / INSPECT' : activeTab === 'architecture' ? '04 / UNDERSTAND' : '05 / SOURCE'}</span><h2>{activeTab === 'playground' ? 'The playground' : activeTab === 'loss' ? 'Training evolution' : activeTab === 'attention' ? 'Attention explorer' : activeTab === 'architecture' ? 'Inside the model' : 'Under the hood'}</h2></div><span className="section-aside">BUILT FROM SCRATCH · RUNNING ON CPU</span></div>
         
         {/* ====================================================================
             TAB 1: PLAYGROUND (STEPPING, PROBABILITIES, STEERING)
             ==================================================================== */}
-        <p className="model-notice">A small model trained from scratch on a narrow teaching curriculum. Outputs can be wrong; token confidence is not factual certainty.</p>
+        <p className="model-notice"><span aria-hidden="true">✳</span> A small model trained on a narrow teaching curriculum. Its answers can be wrong; token confidence is not factual certainty.</p>
         {activeTab === 'playground' && (
           <div className="tab-pane">
             <div className="two-col-grid">
@@ -387,10 +399,8 @@ export default function App() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                 
                 {/* Prompt Suggestions */}
-                <div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBottom: '0.5rem', fontWeight: 500 }}>
-                    Sample Queries
-                  </div>
+                <div className="prompt-suggestions">
+                  <div className="panel-kicker">START WITH A QUESTION</div>
                   <div className="prompt-pills-row">
                     {QUICK_PROMPTS.map((p, idx) => (
                       <button
@@ -408,7 +418,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="card" style={{padding:'1rem'}}>
+                <div className="card topic-card">
                   <label htmlFor="curriculum-topic" style={{display:'block',marginBottom:'.5rem',fontSize:'.8rem'}}>Explore the {curriculumTopics.length} training topics</label>
                   <select id="curriculum-topic" className="textarea-clean" style={{minHeight:'auto'}} value="" disabled={isGenerating || isStepping}
                     onChange={e=>{if(e.target.value) {setPrompt(formatPrompt(e.target.value));setStreamingText('');setStepDetails([]);setGenerationStats(null);setSelectedStepIndex(null);}}}>
@@ -417,16 +427,15 @@ export default function App() {
                   </select>
                 </div>
                 {/* Prompt Input Box */}
-                <div className="card" style={{ padding: '1.25rem' }}>
+                <div className="card prompt-card">
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
-                    <label style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                      Input Prompt
-                    </label>
+                    <label htmlFor="prompt-input" className="panel-title">Your prompt</label>
                     <span style={{ fontSize: '0.72rem', color: 'var(--text-tertiary)' }}>
-                      Press ⌘ + Enter to generate
+                      Press Ctrl / ⌘ + Enter
                     </span>
                   </div>
                   <textarea
+                    id="prompt-input"
                     aria-label="Input prompt"
                     maxLength={4096}
                     disabled={isGenerating || isStepping}
@@ -441,7 +450,7 @@ export default function App() {
                     {Array.from(formatPrompt(prompt)).length} characters · {summary.block_size}-character context
                     {Array.from(formatPrompt(prompt)).length > summary.block_size && ' · Older context will be cropped'}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.85rem' }}>
+                  <div className="prompt-actions">
                     <button
                       className="btn-secondary"
                       onClick={() => {
@@ -486,12 +495,10 @@ export default function App() {
 
                 {generationError && <div className="card" role="alert" style={{color:'#fca5a5'}}>{generationError}</div>}
                 {/* Output Panel with Confidence View Toggle */}
-                <div className="card" style={{ padding: '1.25rem' }}>
+                <div className="card response-card">
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                      <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                        Generation Output
-                      </span>
+                    <div className="response-heading">
+                      <span className="panel-title">Model response</span>
 
                       {/* Text vs Confidence Mode Switcher */}
                       {streamingText && (
@@ -669,7 +676,7 @@ export default function App() {
 
               {/* Right Column: Clean Settings Deck */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <div className="card">
+                <div className="card settings-card">
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                     <Sliders size={15} color="var(--text-secondary)" />
                     <span style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-primary)' }}>
@@ -1202,7 +1209,7 @@ export default function App() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.4rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Attention Heads</span>
-                    <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>4 Heads (head_dim = 32)</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>4 Heads (head_dim = {summary.d_model / 4})</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.4rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Model Dimension (d_model)</span>
@@ -1210,7 +1217,7 @@ export default function App() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.4rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Feed-Forward Expansion (d_mlp)</span>
-                    <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>512 (4x d_model)</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>{summary.d_model * 4} (4x d_model)</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.4rem' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Context Window (block_size)</span>
