@@ -45,15 +45,31 @@ const chartMax = Math.ceil(Math.max(...trainingReport.history.map(p => Math.max(
 const lossPath = (key: 'train_loss' | 'val_loss') => trainingReport.history.map((p,i) => `${i ? 'L' : 'M'} ${40 + 740*p.step/summary.total_steps} ${200 - 180*p[key]/chartMax}`).join(' ');
 const formatPrompt = (text: string) => text.startsWith('User:') ? text : `User: ${text.trim()}\nAssistant: `;
 async function requestAPI(path: string, body?: unknown, signal?: AbortSignal) {
-  const timeout = AbortSignal.timeout(55000);
-  const response = await fetch(`${API_BASE}/api/${path}`, {
-    method: body === undefined ? 'GET' : 'POST',
-    headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
-    body: body === undefined ? undefined : JSON.stringify(body),
-    signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
-  });
-  if (!response.ok) throw new Error(`Request failed (${response.status}). Please try again.`);
-  return response.json();
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const timeout = AbortSignal.timeout(55000);
+      const response = await fetch(`${API_BASE}/api/${path}`, {
+        method: body === undefined ? 'GET' : 'POST',
+        headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
+        body: body === undefined ? undefined : JSON.stringify(body),
+        signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+      });
+      if (!response.ok) {
+        if (attempt === 0 && [502, 503, 504].includes(response.status)) continue;
+        throw new Error(`The model service returned ${response.status}. Please retry.`);
+      }
+      return response.json();
+    } catch (error) {
+      if (signal?.aborted) throw error;
+      if (error instanceof DOMException && error.name === 'TimeoutError') throw new Error('The model took too long to respond. Please retry.');
+      if (error instanceof TypeError) {
+        if (attempt === 0) continue;
+        throw new Error('Connection interrupted. Please retry.');
+      }
+      throw error;
+    }
+  }
+  throw new Error('The model service is temporarily unavailable. Please retry.');
 }
 
 export default function App() {
@@ -85,6 +101,20 @@ export default function App() {
   // Backend status
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
   const [backendDevice, setBackendDevice] = useState<string>('CPU');
+  const healthFailures = useRef(0);
+  const refreshBackendHealth = useCallback(async (signal?: AbortSignal) => {
+    try {
+      const data = await requestAPI('health', undefined, signal);
+      if (signal?.aborted) return;
+      healthFailures.current = 0;
+      setBackendOnline(Boolean(data.model_loaded));
+      setBackendDevice(data.device?.toUpperCase() || 'CPU');
+    } catch {
+      if (signal?.aborted) return;
+      healthFailures.current += 1;
+      if (healthFailures.current > 1) setBackendOnline(false);
+    }
+  }, []);
 
   // Playground State
   const [prompt, setPrompt] = useState<string>("User: Who are you?\nAssistant: ");
@@ -101,6 +131,16 @@ export default function App() {
   const [showLogitDrawer, setShowLogitDrawer] = useState<boolean>(true);
   const [viewMode, setViewMode] = useState<'text' | 'confidence'>('text');
   const [copied, setCopied] = useState<boolean>(false);
+  const [comparison, setComparison] = useState<{focused: string; creative: string; focusedMs: number; creativeMs: number} | null>(null);
+  const [isComparing, setIsComparing] = useState(false);
+  const [compareProgress, setCompareProgress] = useState('');
+  const [compareError, setCompareError] = useState('');
+  const comparisonRequest = useRef<AbortController | null>(null);
+  const changePrompt = (value: string) => {
+    setPrompt(value);
+    setComparison(null);
+    setCompareError('');
+  };
 
   // Attention State
   const [attnInput, setAttnInput] = useState<string>('User: Who are you?');
@@ -119,7 +159,7 @@ export default function App() {
       const data = await requestAPI('attention', { text });
       if (id === attentionRequest.current) setAttnData(data);
     } catch {
-      if (id === attentionRequest.current) setAttentionError('Attention is unavailable. Start the backend or retry the request.');
+      if (id === attentionRequest.current) setAttentionError('Attention is unavailable right now. Please retry.');
     } finally {
       if (id === attentionRequest.current) setIsAttnLoading(false);
     }
@@ -134,19 +174,10 @@ export default function App() {
 
   useEffect(() => {
     const controller = new AbortController();
-    async function checkHealth() {
-      try {
-        const data = await requestAPI('health', undefined, controller.signal);
-        if (!controller.signal.aborted) {
-          setBackendOnline(Boolean(data.model_loaded));
-          setBackendDevice(data.device?.toUpperCase() || 'CPU');
-        }
-      } catch { if (!controller.signal.aborted) setBackendOnline(false); }
-    }
-    checkHealth();
-    const interval = setInterval(checkHealth, 30000);
+    refreshBackendHealth(controller.signal);
+    const interval = setInterval(() => refreshBackendHealth(controller.signal), 30000);
     return () => { controller.abort(); clearInterval(interval); };
-  }, []);
+  }, [refreshBackendHealth]);
   useEffect(() => { fetchAttention('User: Who are you?'); }, [fetchAttention]);
 
   const toggleSound = () => {
@@ -177,10 +208,11 @@ export default function App() {
   };
   useEffect(() => () => {
     generationRequest.current?.abort();
+    comparisonRequest.current?.abort();
     if (animation.current !== null) cancelAnimationFrame(animation.current);
   }, []);
   const runGeneration = async (single: boolean) => {
-    if (isGenerating || isStepping || !prompt.trim()) return;
+    if (isGenerating || isStepping || isComparing || !prompt.trim()) return;
     if (seed && (!/^\d+$/.test(seed) || Number(seed) > 4294967295)) {
       setGenerationError('Seed must be a whole number from 0 to 4294967295, or blank.'); return;
     }
@@ -221,6 +253,40 @@ export default function App() {
   };
   const handleGenerate = () => runGeneration(false);
   const handleStepToken = () => runGeneration(true);
+  const runComparison = async () => {
+    if (isComparing || isGenerating || isStepping || !prompt.trim()) return;
+    const parsedSeed = seed === '' ? undefined : Number(seed);
+    if (parsedSeed !== undefined && (!/^\d+$/.test(seed) || parsedSeed > 4294967295)) {
+      setCompareError('Enter a valid sampling seed, or leave it blank.'); return;
+    }
+    const controller = new AbortController();
+    comparisonRequest.current = controller;
+    setIsComparing(true); setComparison(null); setCompareError('');
+    const input = {prompt: formatPrompt(prompt), max_new_tokens: Math.min(160, maxTokens), seed: parsedSeed};
+    try {
+      setCompareProgress('Generating focused answer…');
+      const focused = await requestAPI('generate', {...input, temperature: 0, top_k: 0, top_p: 1}, controller.signal);
+      if (controller.signal.aborted) return;
+      setCompareProgress('Generating exploratory answer…');
+      const creative = await requestAPI('generate', {...input, temperature: 1.1, top_k: 30, top_p: 0.95}, controller.signal);
+      if (controller.signal.aborted) return;
+      setComparison({focused: focused.generated_text, creative: creative.generated_text, focusedMs: focused.latency_ms, creativeMs: creative.latency_ms});
+      setBackendOnline(true);
+    } catch (error) {
+      if (!controller.signal.aborted) setCompareError(error instanceof Error ? error.message : 'Comparison failed. Please retry.');
+    } finally {
+      if (comparisonRequest.current === controller) {
+        comparisonRequest.current = null;
+        setIsComparing(false); setCompareProgress('');
+      }
+    }
+  };
+  const stopComparison = () => {
+    comparisonRequest.current?.abort();
+    comparisonRequest.current = null;
+    setIsComparing(false);
+    setCompareProgress('');
+  };
 
   // Steer generation by manually clicking a candidate token
   const handleChooseCandidate = (candidate: Candidate) => {
@@ -405,11 +471,11 @@ export default function App() {
                     {QUICK_PROMPTS.map((p, idx) => (
                       <button
                         key={idx}
-                        disabled={isGenerating || isStepping}
+                        disabled={isGenerating || isStepping || isComparing}
                         className="prompt-pill"
                         onClick={() => {
                           playClick(600, 0.02);
-                          setPrompt(p.text);
+                          changePrompt(p.text);
                         }}
                       >
                         {p.label}
@@ -420,8 +486,8 @@ export default function App() {
 
                 <div className="card topic-card">
                   <label htmlFor="curriculum-topic" style={{display:'block',marginBottom:'.5rem',fontSize:'.8rem'}}>Explore the {curriculumTopics.length} training topics</label>
-                  <select id="curriculum-topic" className="textarea-clean" style={{minHeight:'auto'}} value="" disabled={isGenerating || isStepping}
-                    onChange={e=>{if(e.target.value) {setPrompt(formatPrompt(e.target.value));setStreamingText('');setStepDetails([]);setGenerationStats(null);setSelectedStepIndex(null);}}}>
+                  <select id="curriculum-topic" className="textarea-clean" style={{minHeight:'auto'}} value="" disabled={isGenerating || isStepping || isComparing}
+                    onChange={e=>{if(e.target.value) {changePrompt(formatPrompt(e.target.value));setStreamingText('');setStepDetails([]);setGenerationStats(null);setSelectedStepIndex(null);}}}>
                     <option value="">Choose a question…</option>
                     {curriculumTopics.map(item=><option key={item.topic} value={item.question}>{item.question}</option>)}
                   </select>
@@ -438,10 +504,10 @@ export default function App() {
                     id="prompt-input"
                     aria-label="Input prompt"
                     maxLength={4096}
-                    disabled={isGenerating || isStepping}
+                    disabled={isGenerating || isStepping || isComparing}
                     className="textarea-clean"
                     value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
+                    onChange={(e) => changePrompt(e.target.value)}
                     onKeyDown={handleKeyDown}
                     rows={4}
                     placeholder="User: Ask a question...&#10;Assistant: "
@@ -453,10 +519,11 @@ export default function App() {
                   <div className="prompt-actions">
                     <button
                       className="btn-secondary"
+                      disabled={isComparing}
                       onClick={() => {
                         playClick(440, 0.03);
                         stopGeneration(); setGenerationError(''); setGenerationStats(null); setSelectedStepIndex(null);
-                        setPrompt('');
+                        changePrompt('');
                         setStreamingText('');
                         setStepDetails([]);
                       }}
@@ -472,7 +539,7 @@ export default function App() {
                       <button
                         className="btn-secondary"
                         onClick={handleStepToken}
-                        disabled={isGenerating || isStepping || !prompt.trim()}
+                        disabled={isGenerating || isStepping || isComparing || !prompt.trim()}
                         style={{ fontSize: '0.82rem' }}
                         title="Generate exactly 1 token and inspect its candidate probabilities"
                       >
@@ -484,7 +551,7 @@ export default function App() {
                       <button
                         className="btn-primary"
                         onClick={handleGenerate}
-                        disabled={isGenerating || isStepping || !prompt.trim()}
+                        disabled={isGenerating || isStepping || isComparing || !prompt.trim()}
                       >
                         <Play size={14} fill="currentColor" />
                         {isGenerating ? 'Generating...' : 'Generate'}
@@ -493,7 +560,7 @@ export default function App() {
                   </div>
                 </div>
 
-                {generationError && <div className="card" role="alert" style={{color:'#fca5a5'}}>{generationError}</div>}
+                {generationError && <div className="card request-error" role="alert"><span>{generationError}</span><button className="btn-secondary" onClick={handleGenerate} disabled={!prompt.trim() || isComparing}>Retry generation</button></div>}
                 {/* Output Panel with Confidence View Toggle */}
                 <div className="card response-card">
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
@@ -831,6 +898,36 @@ export default function App() {
               </div>
 
             </div>
+            <section className="card comparison-card" aria-labelledby="comparison-title">
+              <div className="comparison-head">
+                <div>
+                  <div className="panel-kicker">EXPERIMENT / 02</div>
+                  <h3 id="comparison-title">See how sampling changes an answer</h3>
+                  <p>Run the same prompt with a focused setting and an exploratory setting. Compare their answers side by side.</p>
+                </div>
+                <div className="comparison-actions">
+                  {isComparing && <button className="btn-secondary" onClick={stopComparison}>Cancel</button>}
+                  <button className="btn-primary" onClick={runComparison} disabled={isComparing || isGenerating || isStepping || !prompt.trim()}>
+                    <Layers size={14} /> {isComparing ? 'Comparing…' : comparison ? 'Compare again' : 'Compare outputs'}
+                  </button>
+                </div>
+              </div>
+              {compareProgress && <p className="comparison-progress" role="status"><span className="engine-dot" />{compareProgress}</p>}
+              {compareError && <div className="request-error" role="alert"><span>{compareError}</span><button className="btn-secondary" onClick={runComparison}>Retry comparison</button></div>}
+              <div className="comparison-grid">
+                <div className="comparison-result">
+                  <div className="comparison-result-head"><span>01 / FOCUSED</span><span>Temperature 0</span></div>
+                  <p>{comparison?.focused || 'A steadier answer with no random sampling.'}</p>
+                  <div className="comparison-result-foot"><span>{comparison ? `${comparison.focusedMs} ms` : 'Waiting for a comparison'}</span><button disabled={!comparison} onClick={() => { setTemperature(0); setTopK(0); setTopP(1); }}>Use settings</button></div>
+                </div>
+                <div className="comparison-result comparison-result-creative">
+                  <div className="comparison-result-head"><span>02 / EXPLORATORY</span><span>Temperature 1.1</span></div>
+                  <p>{comparison?.creative || 'A more varied answer with broader sampling.'}</p>
+                  <div className="comparison-result-foot"><span>{comparison ? `${comparison.creativeMs} ms` : 'Waiting for a comparison'}</span><button disabled={!comparison} onClick={() => { setTemperature(1.1); setTopK(30); setTopP(0.95); }}>Use settings</button></div>
+                </div>
+              </div>
+              <p className="comparison-note">Both runs use the current prompt and seed, with up to {Math.min(160, maxTokens)} generated characters. Sampling can vary even with the same seed.</p>
+            </section>
           </div>
         )}
 
@@ -1082,7 +1179,7 @@ export default function App() {
                 </button>
               </div>
 
-              {attentionError && <p role="alert" style={{color:'#fca5a5'}}>{attentionError}</p>}
+              {attentionError && <div className="request-error" role="alert"><span>{attentionError}</span><button className="btn-secondary" onClick={() => fetchAttention(attnInput)}>Retry analysis</button></div>}
               {isAttnLoading && <p role="status">Computing attention from the trained model…</p>}
               {/* Heatmap Grid */}
               {attnData && (
