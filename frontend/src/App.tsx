@@ -262,7 +262,7 @@ export default function App() {
     const controller = new AbortController();
     comparisonRequest.current = controller;
     setIsComparing(true); setComparison(null); setCompareError('');
-    const input = {prompt: formatPrompt(prompt), max_new_tokens: Math.min(160, maxTokens), seed: parsedSeed};
+    const input = {prompt: formatPrompt(prompt), max_new_tokens: maxTokens, seed: parsedSeed};
     try {
       setCompareProgress('Generating focused answer…');
       const focused = await requestAPI('generate', {...input, temperature: 0, top_k: 0, top_p: 1}, controller.signal);
@@ -926,7 +926,8 @@ export default function App() {
                   <div className="comparison-result-foot"><span>{comparison ? `${comparison.creativeMs} ms` : 'Waiting for a comparison'}</span><button disabled={!comparison} onClick={() => { setTemperature(1.1); setTopK(30); setTopP(0.95); }}>Use settings</button></div>
                 </div>
               </div>
-              <p className="comparison-note">Both runs use the current prompt and seed, with up to {Math.min(160, maxTokens)} generated characters. Sampling can vary even with the same seed.</p>
+              {comparison && comparison.focused === comparison.creative && <p className="comparison-insight">These settings produced the same answer. Try a different prompt to find tokens where sampling makes a difference.</p>}
+              <p className="comparison-note">Both runs use the current prompt and seed, with up to {maxTokens} generated characters. Sampling can vary even with the same seed.</p>
             </section>
           </div>
         )}

@@ -125,6 +125,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .comparison-result-foot button { border: 0; background: none; color: #b6eccc; font: 600 .72rem var(--font-sans); cursor: pointer; }
 .comparison-result-foot button:disabled { color: var(--text-tertiary); cursor: default; }
 .comparison-progress { display: flex; align-items: center; gap: .6rem; color: #aaf0cf; font-size: .8rem; margin: -.3rem 0 1rem; }
+.comparison-insight { color: #c6e6d5; font-size: .78rem; line-height: 1.5; padding: .65rem .8rem; margin: .8rem 0 0; border: 1px solid rgba(170, 240, 207, .2); border-radius: 9px; background: rgba(86, 158, 131, .08); }
 .comparison-note { color: var(--text-tertiary); font-size: .72rem; margin: .85rem 0 0; }
 @media (max-width: 700px) { .comparison-head { align-items: stretch; flex-direction: column; }.comparison-actions { align-self: flex-start; }.comparison-grid { grid-template-columns: 1fr; }.comparison-card { padding: 1.1rem; } }
 @media (max-width: 1000px) { .header-inner { grid-template-columns: minmax(0, 1fr) auto; }.lab-intro { grid-template-columns: 1fr 300px; }.intro-copy { padding: 2.5rem; }.intro-visual { padding: 1.2rem; }.two-col-grid { grid-template-columns: minmax(0, 1fr) 290px; } }
