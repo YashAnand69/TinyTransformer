@@ -1,7 +1,7 @@
 # TinyTransformer Lab
 
 An inspectable language model trained from random weights, with a React playground,
-real attention heatmaps, next-token probabilities, and measured training telemetry
+real attention heatmaps, next-token probabilities, and measured training telemetry.
 Runs locally with PyTorch or on Netlify with the same weights exported to ONNX.
 
 ## What's improved in v2
